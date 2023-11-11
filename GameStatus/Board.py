@@ -1,4 +1,5 @@
 from GameStatus.Tile import Tile
+from typing import List
 
 class Board:
     def __to_tiles(self):
@@ -25,11 +26,11 @@ class Board:
         self.rows = len(self.__matrix)
         self.cols = len(self.__matrix[0])
 
-    def get(self, row, col):
+    def get(self, row: int, col: int) -> Tile:
         assert self.in_bounds(row,col), "Index of bounds for board"
         return self.__matrix[row][col]
 
-    def set(self, row, col, piece):
+    def set(self, row: int, col: int , piece: Tile):
         assert self.in_bounds(row, col), "Index of bounds for board"
         self.__matrix[row][col] = piece
 
@@ -66,13 +67,14 @@ class Board:
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    def in_bounds(self, row, col):
+    def in_bounds(self, row: int, col: int) -> bool:
         return row < self.rows and row >= 0 and col < self.cols and col >= 0
 
-    def move_piece(self, row, col):
+    def move_piece(self, row: int, col: int) -> List["Board"]:
+        assert self.in_bounds(row, col)
         piece = self.__matrix[row][col]
         new_rows = []
-        if piece.is_pawn():
+        if piece.is_checker():
             if piece.is_white():
                 new_rows.append(row+1)
             else:
@@ -84,17 +86,50 @@ class Board:
         valid_moves = []
         for new_row in new_rows:
             for new_col in [col+1, col-1]:
-                if self.in_bounds(new_row, new_col) and self.__matrix[new_row][new_col] == Tile.NONE:
+                if self.in_bounds(new_row, new_col) and self.__matrix[new_row][new_col] == Tile.EMPTY:
                     board_with_move = Board(self)
-                    board_with_move.set(row, col, Tile.NONE)
+                    board_with_move.set(row, col, Tile.EMPTY)
                     board_with_move.set(new_row, new_col, piece)
                     valid_moves.append(board_with_move)
         return valid_moves
 
-    def eat_piece(self, row, col, piece):
-        print("gnammmm")
+    def jump_with_piece(self, row: int, col: int) -> List["Board"]:
+        assert self.in_bounds(row, col)
+        piece = self.__matrix[row][col]
+        to_eat = []
+        to_land_on = []
 
-    def moves(self, whiteTurn):
+        if piece.is_checker():
+            if piece.is_white():
+                to_eat.extend([(row+1, col + 1), (row+1, col - 1)])
+                to_land_on.extend([(row+2, col+2), (row+2, col - 2)])
+            else:
+                to_eat.extend([(row-1, col + 1), (row-1, col - 1)])
+                to_land_on.extend([(row - 2, col + 2), (row - 2, col - 2)])
+        elif piece.is_king():
+            to_eat.extend([(row + 1, col + 1), (row + 1, col - 1), (row-1, col + 1), (row-1, col - 1)])
+            to_eat.extend([(row - 2, col + 2), (row - 2, col - 2), (row-1, col + 1), (row-1, col - 1)])
+        else:
+            return []
+        valid_moves = []
+        for i in range(len(to_eat)):
+            target_pos = to_eat[i]
+            landing_pos = to_land_on[i]
+            # both target and landing need to be in bounds. Checking for landing is sufficient
+            if self.in_bounds(landing_pos[0], landing_pos[1]):
+                # cannot eat same color and landing needs to empty
+                target = self.__matrix[target_pos[0]][target_pos[1]]
+                landing = self.__matrix[landing_pos[0]][landing_pos[1]]
+                if ((piece.is_white() and target.is_black()) or (piece.is_black() and target.is_white())) and landing.is_empty():
+                    new_board = Board(self)
+                    new_board.set(target_pos[0], target_pos[1], Tile.EMPTY)
+                    new_board.set(row, col, Tile.EMPTY)
+                    new_board.set(landing_pos[0], landing_pos[1], piece)
+                    valid_moves.append(new_board)
+                    # TODO recursive call for multiple jumps
+        return valid_moves
+
+    def moves(self, whiteTurn: bool) -> List["Board"]:
         moves = []
         for row in range(self.rows):
             for col in range(self.cols):
@@ -102,4 +137,5 @@ class Board:
                     piece = self.__matrix[row][col]
                     if (piece.is_white() and whiteTurn) or (piece.is_black() and not whiteTurn):
                         moves.extend(self.move_piece(row, col))
+                        moves.extend(self.jump_with_piece(row, col))
         return moves

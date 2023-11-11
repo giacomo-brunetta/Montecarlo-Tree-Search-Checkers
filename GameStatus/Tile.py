@@ -1,10 +1,10 @@
 from enum import Enum
 
 class Tile(Enum):
-    NONE = 0
-    BLACK_PAWN = -1
+    EMPTY = 0
+    BLACK_CHECKER = -1
     BLACK_KING = -2
-    WHITE_PAWN = 1
+    WHITE_CHECKER = 1
     WHITE_KING = 2
 
     def is_white(self):
@@ -19,7 +19,7 @@ class Tile(Enum):
     def is_king(self):
         return self.value == 2 or self.value == -2
 
-    def is_pawn(self):
+    def is_checker(self):
         return self.value == 1 or self.value == -1
 
     def __repr__(self):
@@ -32,7 +32,7 @@ class Tile(Enum):
         if abs(self.value) == 2:
             type = "K"
         else:
-            type = "P"
+            type = "c"
         return type + col
 
     def __str__(self):
