@@ -19,6 +19,9 @@ class Tile(Enum):
     def is_king(self):
         return self.value == 2 or self.value == -2
 
+    def is_pawn(self):
+        return self.value == 1 or self.value == -1
+
     def __repr__(self):
         if self.value == 0:
             return "  "
