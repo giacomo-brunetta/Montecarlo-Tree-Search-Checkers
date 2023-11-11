@@ -2,13 +2,13 @@ from GameStatus.Tile import Tile
 
 class Board:
     def __to_tiles(self):
-        for i in range(len(self.matrix)):
-            for j in range(len(self.matrix[0])):
-                self.matrix[i][j] = Tile(self.matrix[i][j])
+        for i in range(len(self.__matrix)):
+            for j in range(len(self.__matrix[0])):
+                self.__matrix[i][j] = Tile(self.__matrix[i][j])
 
     def __init__(self, boardToCopy = None):
         if boardToCopy == None:
-            self.matrix = [
+            self.__matrix = [
                 [1, 0, 1, 0, 1, 0, 1, 0],
                 [0, 1, 0, 1, 0, 1, 0, 1],
                 [1, 0, 1, 0, 1, 0, 1, 0],
@@ -21,13 +21,21 @@ class Board:
             self.__to_tiles()
         else:
             assert isinstance(boardToCopy, Board)
-            self.matrix = [[element for element in line] for line in boardToCopy.matrix]
-        self.rows = len(self.matrix)
-        self.cols = len(self.matrix[0])
+            self.__matrix = [[element for element in line] for line in boardToCopy.__matrix]
+        self.rows = len(self.__matrix)
+        self.cols = len(self.__matrix[0])
+
+    def get(self, row, col):
+        assert self.in_bounds(row,col), "Index of bounds for board"
+        return self.__matrix[row][col]
+
+    def set(self, row, col, piece):
+        assert self.in_bounds(row, col), "Index of bounds for board"
+        self.__matrix[row][col] = piece
 
     def __repr__(self):
         string = ""
-        for row in self.matrix:
+        for row in self.__matrix:
             for tile in row:
                 string += str(tile) + " "
             string += "\n"
@@ -41,17 +49,17 @@ class Board:
         if type(other) != type(self):
             return False
 
-        rows = len(self.matrix)
-        cols = len(self.matrix[0])
+        rows = len(self.__matrix)
+        cols = len(self.__matrix[0])
 
         # have the same shape
-        if not rows == len(other.matrix) or not cols == len(other.matrix[0]):
+        if not rows == len(other.__matrix) or not cols == len(other.__matrix[0]):
             return False
 
         # check that every pos is equal
         for i in range(rows):
             for j in range(cols):
-                if self.matrix[i][j] != other.matrix[i][j]:
+                if self.__matrix[i][j] != other.__matrix[i][j]:
                     return False
         return True
 
@@ -61,7 +69,8 @@ class Board:
     def in_bounds(self, row, col):
         return row < self.rows and row >= 0 and col < self.cols and col >= 0
 
-    def move_piece(self, row, col, piece):
+    def move_piece(self, row, col):
+        piece = self.__matrix[row][col]
         new_rows = []
         if piece.is_pawn():
             if piece.is_white():
@@ -75,10 +84,10 @@ class Board:
         valid_moves = []
         for new_row in new_rows:
             for new_col in [col+1, col-1]:
-                if self.in_bounds(new_row, new_col) and self.matrix[new_row][new_col] == Tile.NONE:
+                if self.in_bounds(new_row, new_col) and self.__matrix[new_row][new_col] == Tile.NONE:
                     board_with_move = Board(self)
-                    board_with_move.matrix[row][col] = Tile.NONE
-                    board_with_move.matrix[new_row][new_col] = piece
+                    board_with_move.set(row, col, Tile.NONE)
+                    board_with_move.set(new_row, new_col, piece)
                     valid_moves.append(board_with_move)
         return valid_moves
 
@@ -89,7 +98,8 @@ class Board:
         moves = []
         for row in range(self.rows):
             for col in range(self.cols):
-                piece = self.matrix[row][col]
-                if piece.is_white() == whiteTurn:
-                    moves.extend(self.move_piece(row, col, piece))
+                if (row + col) % 2 == 0:
+                    piece = self.__matrix[row][col]
+                    if (piece.is_white() and whiteTurn) or (piece.is_black() and not whiteTurn):
+                        moves.extend(self.move_piece(row, col))
         return moves
