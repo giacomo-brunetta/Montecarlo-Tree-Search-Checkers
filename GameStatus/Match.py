@@ -19,6 +19,7 @@ class Match:
 
     def play(self):
         numPlayers= len(self.__palayers)
+        assert numPlayers>=2
         i=0
         while True:
             playerOnMove= self.__palayers[i%numPlayers]
