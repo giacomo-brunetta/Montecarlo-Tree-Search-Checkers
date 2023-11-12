@@ -11,7 +11,7 @@ class Match:
         self.__isGameOver= False
 
     def move(self, player: Type['Player']) -> None:
-        newGameStatus= player.move(self.game)
+        newGameStatus= player.move(self.__game)
         if newGameStatus == None:
             self.end()
         else:
