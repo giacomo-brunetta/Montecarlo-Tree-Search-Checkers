@@ -1,5 +1,5 @@
 import unittest
-from GameStatus.Checkers import Checkers as Board, Checkers
+from GameStatus.Checkers import Checkers as Checkers
 from GameStatus.Tile import Tile as Tile
 from GameStatus.Node import Node as Node
 from GameStatus.MontecarloTreeSearch import MontecarloTreeSearch as MontecarloTreeSearch
@@ -35,6 +35,17 @@ class TestBoard(unittest.TestCase):
 
         self.assertEqual(b, b2)
         self.assertNotEqual(b, b1)
+    
+    def testCopy(self):
+        b0 = Checkers()
+        b0.set(0, 0, Tile.WHITE_CHECKER)
+        b1 = Checkers(b0)
+        b2= b0.copy()
+        self.assertTrue(b0 is not b1)
+        self.assertEqual(b0, b1)
+        self.assertTrue(b0 is not b2)
+        self.assertEqual(b0, b2)
+
 
     def testInBounds(self):
         b = Checkers()
@@ -55,7 +66,7 @@ class TestBoard(unittest.TestCase):
         b.set(5, 1,Tile.EMPTY)
         b.set(5, 3, Tile.EMPTY)
 
-        self.assertEqual(len(b.moves(0)), 4)
+        self.assertEqual(len(b.moves(1)), 4)
 
 
         for row in range(6,b.rows):
@@ -63,7 +74,7 @@ class TestBoard(unittest.TestCase):
                 if b.is_settable(row,col):
                     b.set(row,col, Tile.EMPTY)
 
-        self.assertEqual(len(b.moves(0)), 1)
+        self.assertEqual(len(b.moves(1)), 1)
 
         for row in range(b.rows):
             for col in range(b.cols):
@@ -75,7 +86,7 @@ class TestBoard(unittest.TestCase):
         b.set(1, 1, Tile.BLACK_KING)
         b.set(5, 5, Tile.BLACK_KING)
 
-        self.assertEqual(len(b.moves(0)), 1)
+        self.assertEqual(len(b.moves(1)), 1)
 
     """
     def testRandom(self):

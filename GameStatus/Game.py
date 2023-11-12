@@ -9,3 +9,7 @@ class Game(ABC):
     @abstractmethod
     def randomMove(self, turn: int) -> Type['Game']:
         pass
+
+    @abstractmethod
+    def copy() -> Type['Game']:
+        pass
