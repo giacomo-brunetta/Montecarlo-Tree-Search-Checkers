@@ -3,9 +3,9 @@ from typing import List,Type
 
 class Game(ABC):
     @abstractmethod
-    def moves() -> List[Type['Game']]:
+    def moves(self, turn: int) -> List[Type['Game']]:
         pass
     
     @abstractmethod
-    def randomMove() -> Type['Game']:
+    def randomMove(self, turn: int) -> Type['Game']:
         pass

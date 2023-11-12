@@ -1,6 +1,7 @@
 from GameStatus.Tile import Tile
 from GameStatus.Game import Game
 from typing import List, Type
+from random import randint
 
 class Checkers(Game):
     def __to_tiles(self):
@@ -27,6 +28,9 @@ class Checkers(Game):
         self.rows = len(self.__matrix)
         self.cols = len(self.__matrix[0])
 
+
+    def is_white_turn(self, turn:int):
+        return turn % 2 == 1
 
     def is_settable(self, row:int, col:int):
         return self.in_bounds(row, col) and (row + col) % 2 == 0
@@ -150,14 +154,15 @@ class Checkers(Game):
                 valid_moves.append(move)
         return valid_moves
 
-    def moves(self, whiteTurn: bool) -> List["Checkers"]:
+    def moves(self, turn: int) -> List["Checkers"]:
+        isWhiteTurn = self.is_white_turn(turn)
         moves = []
         max_jumps = 0
         for row in range(self.rows):
             for col in range(self.cols):
                 if (row + col) % 2 == 0:
                     piece = self.__matrix[row][col]
-                    if (piece.is_white() and whiteTurn) or (piece.is_black() and not whiteTurn):
+                    if (piece.is_white() and isWhiteTurn) or (piece.is_black() and not isWhiteTurn):
                         jump_moves = self.__jumps(row, col)
                         if len(jump_moves) > 0:
                             current_jumps = jump_moves[0][1]
@@ -171,5 +176,11 @@ class Checkers(Game):
                             moves.extend(self.__move_piece(row, col))
         return moves
 
-    def randomMove(self) -> Type['Checkers']:
-        return Checkers()
+    def randomMove(self, turn: int) -> Type['Checkers']:
+        valid_moves = self.moves(turn)
+        if len(valid_moves) == 0:
+            return None
+        rnd = randint(0, len(valid_moves)-1)
+        return valid_moves[rnd]
+
+
