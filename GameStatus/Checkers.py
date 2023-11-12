@@ -2,14 +2,14 @@ from GameStatus.Tile import Tile
 from GameStatus.Game import Game
 from typing import List, Type
 
-class Board(Game):
+class Checkers(Game):
     def __to_tiles(self):
         for i in range(len(self.__matrix)):
             for j in range(len(self.__matrix[0])):
                 self.__matrix[i][j] = Tile(self.__matrix[i][j])
 
-    def __init__(self, boardToCopy = None):
-        if boardToCopy == None:
+    def __init__(self, checkersToCopy = None):
+        if checkersToCopy == None:
             self.__matrix = [
                 [1, 0, 1, 0, 1, 0, 1, 0],
                 [0, 1, 0, 1, 0, 1, 0, 1],
@@ -22,17 +22,21 @@ class Board(Game):
             ]
             self.__to_tiles()
         else:
-            assert isinstance(boardToCopy, Board)
-            self.__matrix = [[element for element in line] for line in boardToCopy.__matrix]
+            assert isinstance(checkersToCopy, Checkers)
+            self.__matrix = [[element for element in line] for line in checkersToCopy.__matrix]
         self.rows = len(self.__matrix)
         self.cols = len(self.__matrix[0])
+
+
+    def is_settable(self, row:int, col:int):
+        return self.in_bounds(row, col) and (row + col) % 2 == 0
 
     def get(self, row: int, col: int) -> Tile:
         assert self.in_bounds(row,col), "Index of bounds for board"
         return self.__matrix[row][col]
 
-    def set(self, row: int, col: int , piece: Tile):
-        assert self.in_bounds(row, col), "Index of bounds for board"
+    def set(self, row: int, col: int, piece: Tile):
+        assert self.is_settable(row, col), "Cannot set this cell"
         self.__matrix[row][col] = piece
 
     def __repr__(self) -> str:
@@ -95,14 +99,14 @@ class Board(Game):
         else:
             return []
 
-    def __move_piece(self, row: int, col: int) -> List["Board"]:
+    def __move_piece(self, row: int, col: int) -> List["Checkers"]:
         assert self.in_bounds(row, col)
         piece = self.__matrix[row][col]
         possible_positions = self.__move_on_or_eat(row,col,piece)
         valid_moves = []
         for pos in possible_positions:
                 if self.in_bounds(pos[0], pos[1]) and self.__matrix[pos[0]][pos[1]] == Tile.EMPTY:
-                    board_with_move = Board(self)
+                    board_with_move = Checkers(self)
                     board_with_move.set(row, col, Tile.EMPTY)
                     board_with_move.set(pos[0], pos[1], piece)
                     valid_moves.append(board_with_move)
@@ -125,7 +129,7 @@ class Board(Game):
                 landing = self.__matrix[landing_pos[0]][landing_pos[1]]
                 if ((piece.is_white() and target.is_black()) or (piece.is_black() and target.is_white())) and landing.is_empty():
                     # create a new board and perform the jump
-                    new_board = Board(self)
+                    new_board = Checkers(self)
                     new_board.set(target_pos[0], target_pos[1], Tile.EMPTY)
                     new_board.set(row, col, Tile.EMPTY)
                     new_board.set(landing_pos[0], landing_pos[1], piece)
@@ -146,7 +150,7 @@ class Board(Game):
                 valid_moves.append(move)
         return valid_moves
 
-    def moves(self, whiteTurn: bool) -> List["Board"]:
+    def moves(self, whiteTurn: bool) -> List["Checkers"]:
         moves = []
         max_jumps = 0
         for row in range(self.rows):
@@ -167,5 +171,5 @@ class Board(Game):
                             moves.extend(self.__move_piece(row, col))
         return moves
 
-    def randomMove(self) -> Type['Board']:
-        return Board()
+    def randomMove(self) -> Type['Checkers']:
+        return Checkers()

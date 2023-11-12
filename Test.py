@@ -1,5 +1,5 @@
 import unittest
-from GameStatus.Board import Board as Board
+from GameStatus.Checkers import Checkers as Board, Checkers
 from GameStatus.Tile import Tile as Tile
 from GameStatus.Node import Node as Node
 from GameStatus.MontecarloTreeSearch import MontecarloTreeSearch as MontecarloTreeSearch
@@ -7,8 +7,8 @@ from GameStatus.MontecarloTreeSearch import MontecarloTreeSearch as MontecarloTr
 
 class TestBoard(unittest.TestCase):
     def test_equal(self):
-        b = Board()
-        b1 = Board()
+        b = Checkers()
+        b1 = Checkers()
 
         self.assertEqual(b, b)  # equal to self
         self.assertEqual(b, b1)  # equal to identical
@@ -28,16 +28,16 @@ class TestBoard(unittest.TestCase):
         self.assertNotEqual((), b)
 
     def testInit(self):
-        b = Board()
+        b = Checkers()
         b.set(0, 0, Tile.BLACK_KING)
-        b1 = Board()
-        b2 = Board(b)
+        b1 = Checkers()
+        b2 = Checkers(b)
 
         self.assertEqual(b, b2)
         self.assertNotEqual(b, b1)
 
     def testInBounds(self):
-        b = Board()
+        b = Checkers()
         self.assertTrue(b.in_bounds(0, 0))
         self.assertTrue(b.in_bounds(7, 7))
         self.assertFalse(b.in_bounds(-1, 0))
@@ -46,25 +46,27 @@ class TestBoard(unittest.TestCase):
         self.assertFalse(b.in_bounds(0, 8))
 
     def testMoves(self):
-        b = Board()
+        b = Checkers()
         self.assertEqual(len(b.moves(whiteTurn=True)), 7)
         self.assertEqual(len(b.moves(whiteTurn=False)), 7)
 
         b.set(3, 1,Tile.BLACK_CHECKER)
         b.set(3, 3, Tile.BLACK_CHECKER)
-        b.set(6, 1,Tile.EMPTY)
-        b.set(6, 3, Tile.EMPTY)
+        b.set(5, 1,Tile.EMPTY)
+        b.set(5, 3, Tile.EMPTY)
+
         self.assertEqual(len(b.moves(whiteTurn=True)), 4)
 
         for row in range(6,b.rows):
             for col in range(b.cols):
-                b.set(row,col, Tile.EMPTY)
-
-        self.assertEqual(len(b.moves(whiteTurn=True)), 7)
+                if b.is_settable(row,col):
+                    b.set(row,col, Tile.EMPTY)
+        self.assertEqual(len(b.moves(whiteTurn=True)), 1)
 
         for row in range(b.rows):
             for col in range(b.cols):
-                b.set(row,col, Tile.EMPTY)
+                if b.is_settable(row, col):
+                    b.set(row,col, Tile.EMPTY)
 
         b.set(4, 4,Tile.WHITE_KING)
         b.set(3, 3,Tile.BLACK_KING)
@@ -89,8 +91,8 @@ class TestNode(unittest.TestCase):
         root6= Node("string")
         root7= Node([0,1,2])
         root8= Node([0,1,2])
-        root9= Node(Board())
-        root10= Node(Board())
+        root9= Node(Checkers())
+        root10= Node(Checkers())
         
         self.assertEqual(root0, root0)  # equal to self
         self.assertEqual(root0, root1)  # empty node equal to identical

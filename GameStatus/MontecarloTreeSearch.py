@@ -1,10 +1,10 @@
 from GameStatus.Node import Node as Node
-from GameStatus.Board import Board as Board
+from GameStatus.Checkers import Checkers
 from random import random
 
 class MontecarloTreeSearch(Node):
-    def __init__(self, obj: Board, isWhiteTurn: bool, height: int, probability: float):
-        assert isinstance(obj,Board)
+    def __init__(self, obj: Checkers, isWhiteTurn: bool, height: int, probability: float):
+        assert isinstance(obj, Checkers)
         super().__init__(obj)
         
         self.__isWhiteTurn= isWhiteTurn
