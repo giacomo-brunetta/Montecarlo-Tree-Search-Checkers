@@ -3,7 +3,7 @@ from GameStatus.Board import Board as Board
 from random import random
 
 class MontecarloTreeSearch(Node):
-    def __init__(self, obj: Board, isWhiteTurn: bool, height: int):
+    def __init__(self, obj: Board, isWhiteTurn: bool, height: int, probability: float):
         assert isinstance(obj,Board)
         super().__init__(obj)
         
@@ -12,15 +12,20 @@ class MontecarloTreeSearch(Node):
         self.__wons= 0
         self.__losses= 0
         self.__stalemate= 0
-        self.__probability= 0
+        self.__probability= probability
+    
+    def getNumSimulation(self) -> int:
+        return self.__wons + self.__losses + self.__stalemate
     
     def getProbability(self):
         return self.__probability
     
     def populateTreeLevel(self, whiteTurn: bool):
         assert len(self.__children) == 0, "metod to populate tree already called on this instance of the board"
-        for possibleMove in self.__value.moves(whiteTurn):
-            self.newChild(MontecarloTreeSearch(possibleMove,not whiteTurn, self.__height+1))
+        moves= self.__value.moves(whiteTurn)
+        prob= 1/len(moves)
+        for possibleMove in moves:
+            self.newChild(MontecarloTreeSearch(possibleMove,not whiteTurn, self.__height+1, prob))
             
     def populateNLevelsTree(self, n: int):
         if n>0:
@@ -65,7 +70,7 @@ class MontecarloTreeSearch(Node):
                 else:
                     return 1
             #altrimenti chiami sul nodo che hai ottenuto randomVisitAndSave
-            MontecarloTreeSearch(nextBoard, not self.__isWhiteTurn, self.__height+1).randomVisitAndSave(n)
+            MontecarloTreeSearch(nextBoard, not self.__isWhiteTurn, self.__height+1, None).randomVisitAndSave(n)
 
 
 

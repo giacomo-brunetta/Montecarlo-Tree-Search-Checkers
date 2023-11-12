@@ -36,6 +36,15 @@ class TestBoard(unittest.TestCase):
         self.assertEqual(b, b2)
         self.assertNotEqual(b, b1)
 
+    def testInBounds(self):
+        b = Board()
+        self.assertTrue(b.in_bounds(0, 0))
+        self.assertTrue(b.in_bounds(7, 7))
+        self.assertFalse(b.in_bounds(-1, 0))
+        self.assertFalse(b.in_bounds(7, -1))
+        self.assertFalse(b.in_bounds(8, 0))
+        self.assertFalse(b.in_bounds(0, 8))
+
     def testMoves(self):
         b = Board()
         self.assertEqual(len(b.moves(whiteTurn=True)), 7)
@@ -63,6 +72,7 @@ class TestBoard(unittest.TestCase):
         b.set(5, 5, Tile.BLACK_KING)
 
         self.assertEqual(len(b.moves(whiteTurn=True)), 1)
+
 
 class TestNode(unittest.TestCase):
     def testGetValue(self):
@@ -95,7 +105,6 @@ class TestNode(unittest.TestCase):
         self.assertNotEqual(root4, root9) # int node different from board node
         self.assertNotEqual(root7, root9) # list node different from board node
     
-
     def testStr(self):
         root0= Node(None)
         root2= Node(2)
@@ -140,19 +149,11 @@ class TestNode(unittest.TestCase):
         self.assertTrue(len(Node(0).getChildren()) == 0)
 
 
-
 class TestMontecarloTreeSearch(unittest.TestCase):
     def tes(self):
+        #root= MontecarloTreeSearch(Board(),False,0,1)
+        #child= MontecarloTreeSearch(Board().randomMove(),True,0,None)
         pass
-
-    def testInBounds(self):
-        b = Board()
-        self.assertTrue(b.in_bounds(0, 0))
-        self.assertTrue(b.in_bounds(7, 7))
-        self.assertFalse(b.in_bounds(-1, 0))
-        self.assertFalse(b.in_bounds(7, -1))
-        self.assertFalse(b.in_bounds(8, 0))
-        self.assertFalse(b.in_bounds(0, 8))
 
 
 if __name__ == '__main__':

@@ -1,7 +1,8 @@
 from GameStatus.Tile import Tile
-from typing import List
+from GameStatus.Game import Game
+from typing import List, Type
 
-class Board:
+class Board(Game):
     def __to_tiles(self):
         for i in range(len(self.__matrix)):
             for j in range(len(self.__matrix[0])):
@@ -34,7 +35,7 @@ class Board:
         assert self.in_bounds(row, col), "Index of bounds for board"
         self.__matrix[row][col] = piece
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         string = ""
         for row in self.__matrix:
             for tile in row:
@@ -42,10 +43,10 @@ class Board:
             string += "\n"
         return string
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.__repr__()
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         # are the same type
         if type(other) != type(self):
             return False
@@ -166,5 +167,5 @@ class Board:
                             moves.extend(self.__move_piece(row, col))
         return moves
 
-    def random_move(self):
+    def randomMove(self) -> Type['Board']:
         return Board()
