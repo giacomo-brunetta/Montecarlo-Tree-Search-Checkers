@@ -55,7 +55,7 @@ class TestBoard(unittest.TestCase):
         b.set(5, 1,Tile.EMPTY)
         b.set(5, 3, Tile.EMPTY)
 
-        self.assertEqual(len(b.moves(1)), 4)
+        self.assertEqual(len(b.moves(0)), 4)
 
 
         for row in range(6,b.rows):
@@ -63,7 +63,7 @@ class TestBoard(unittest.TestCase):
                 if b.is_settable(row,col):
                     b.set(row,col, Tile.EMPTY)
 
-        self.assertEqual(len(b.moves(1)), 1)
+        self.assertEqual(len(b.moves(0)), 1)
 
         for row in range(b.rows):
             for col in range(b.cols):
@@ -75,7 +75,7 @@ class TestBoard(unittest.TestCase):
         b.set(1, 1, Tile.BLACK_KING)
         b.set(5, 5, Tile.BLACK_KING)
 
-        self.assertEqual(len(b.moves(1)), 1)
+        self.assertEqual(len(b.moves(0)), 1)
 
     """
     def testRandom(self):
