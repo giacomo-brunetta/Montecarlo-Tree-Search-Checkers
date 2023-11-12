@@ -29,17 +29,17 @@ class TestBoard(unittest.TestCase):
 
     def testInit(self):
         b = Checkers()
-        b.set(0, 0, Tile.BLACK_KING)
         b1 = Checkers()
-        b2 = Checkers(b)
 
-        self.assertEqual(b, b2)
+        self.assertEqual(b,b1)
+
+        b.set(0, 0, Tile.BLACK_KING)
         self.assertNotEqual(b, b1)
     
     def testCopy(self):
         b0 = Checkers()
         b0.set(0, 0, Tile.WHITE_CHECKER)
-        b1 = Checkers(b0)
+        b1 = b0.copy()
         b2= b0.copy()
         self.assertTrue(b0 is not b1)
         self.assertEqual(b0, b1)
