@@ -8,25 +8,24 @@ from math import sqrt, log
 from time import time
 
 
-
 class MontecarloTreeSearch(Node):
-    n= 4 #keei in memory about 10^4 Board
+    n= 4 #keep in memory about 10^4 Board
     seconsPerMove= 30
 
     def explorationExploitationF(wi: int, ni: int, Ni: int, c: float =sqrt(2)):
         assert Ni>=ni and ni>0 and ni>=wi, "impossible parameters, no meaning"
         return wi/ni+c*sqrt(log(Ni)/ni)
     
-    def populateTreeLevel(self, whiteTurn: bool):
+    def populateTreeLevel(self):
         assert len(self.getChildren()) == 0, "metod to populate tree already called on this instance of the board"
-        moves= self.getValue().moves(whiteTurn)
+        moves= self.getValue().moves(self.__height)
         prob= 1/len(moves)
         for possibleMove in moves:
-            self.newChild(MontecarloTreeSearch(possibleMove,not whiteTurn, self.__height+1, prob))
+            self.newChild(MontecarloTreeSearch(possibleMove,not self.__isWhiteTurn, self.__height+1, prob))
             
     def populateNLevelsTree(self, n: int):
         if n>0:
-            self.populateTreeLevel(self.__isWhiteTurn)
+            self.populateTreeLevel()
             for child in self.getChildren():
                 child.populateNLevelsTree(n-1)
 
@@ -100,7 +99,7 @@ class MontecarloTreeSearch(Node):
             return 0
         else:#altezza menouno significa che non è da salvare il risultato
             #farma un unico nodo a caso con la funzione di farming singola e crea un nodo di altezza ++
-            nextBoard= self.getValue().randomMove()
+            nextBoard= self.getValue().randomMove(self.__height)
             #se il nodo farmato è None allora hai finito e ha perso isWhiteTurn quindi ritorni -1 se era bianco o +1 se nero
             if nextBoard==None:
                 if self.__isWhiteTurn()==True:
@@ -126,4 +125,7 @@ class MontecarloTreeSearch(Node):
             else:
                 bestChild= child
         return bestChild.copy()
+    
+    def move(self) -> Type['Game']:
+        return self.findNextBestMoove()
     

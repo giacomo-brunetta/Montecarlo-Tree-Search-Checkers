@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from typing import List,Type
 
 class Game(ABC):
+    name= None
+
     @abstractmethod
     def moves(self, turn: int) -> List[Type['Game']]:
         pass
