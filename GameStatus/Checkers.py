@@ -152,9 +152,14 @@ class Checkers(Game):
 
     def __repr__(self) -> str:
         string = ""
-        for row in self._board:
-            for tile in row:
-                string += str(tile) + " "
+        for i in range(self.rows):
+
+            for j in range(self.cols):
+                tile = self._board[i][j]
+                if tile.is_empty():
+                    string += "🟨" if (i+j) % 2 == 0 else "🟩"
+                else:
+                    string += str(tile)
             string += "\n"
         return string
 

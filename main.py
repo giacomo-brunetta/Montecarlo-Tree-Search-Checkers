@@ -1,1 +1,3 @@
-print("Hello world!")
+from GameStatus.Checkers import Checkers as Checkers
+
+print(Checkers())

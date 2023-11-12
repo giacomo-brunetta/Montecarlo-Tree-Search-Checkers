@@ -88,6 +88,17 @@ class TestBoard(unittest.TestCase):
 
         self.assertEqual(len(b.moves(0)), 1)
 
+        b.set(5, 3, Tile.BLACK_KING)
+
+        self.assertEqual(len(b.moves(0)), 1)
+
+        b.set(5, 1, Tile.BLACK_KING)
+
+        self.assertEqual(len(b.moves(0)), 2)
+
+        b.set(5, 1, Tile.BLACK_CHECKER)
+        self.assertEqual(len(b.moves(0)), 1)
+
     """
     def testRandom(self):
         board = Checkers()
