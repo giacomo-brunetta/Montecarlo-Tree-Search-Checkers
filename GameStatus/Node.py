@@ -4,7 +4,6 @@ class Node:
         self.__children = []
 
     def newChild(self, node):
-        #assert node!=None, "expected not None element as leaf in the tree"
         assert isinstance(node, Node), "expected Node element as leaf in the tree"
         self.__children.append(node)
     
