@@ -11,7 +11,7 @@ The players can be:
 
 ![MCTS](https://i.stack.imgur.com/GR7qf.png)
 
-To create game-agnostic BOTs we chose to implement [Monte Carlo Tree Search](https://en.wikipedia.org/wiki/Monte_Carlo_tree_search): a search algorithm that performs a sparse visit of the state space by performing random layouts and suggests the move that leads to the biggest probability of winning as the best.
+To create game-agnostic BOTs we chose to implement [Monte Carlo Tree Search](https://en.wikipedia.org/wiki/Monte_Carlo_tree_search): a search algorithm that performs a sparse visit of the state space by performing random playouts. The move that lead to the highest probability of winning is chosen as the best.
 
 ### Pros: 
 - it is context agnostic
