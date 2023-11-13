@@ -10,10 +10,10 @@ class MontecarloMachinePlayer(Player):
         self.__lvls= levelsOfMemory
         self.__sec= seconsPerMove
         self.__haveWhites= haveWhites
-        self.__engine= MontecarloTreeSearch(game,levelsOfMemory,haveWhites,0,1)
+        self.__engine= MontecarloTreeSearch(None,game,levelsOfMemory,haveWhites,0,1)
         self.__engine.setSecPerMove(seconsPerMove)
 
     def move(self, gameStatus: Type['Game'], turn: int) -> Type['Game']:
-        self.__engine= MontecarloTreeSearch(gameStatus,self.__lvls,self.__haveWhites,0,1)
+        self.__engine= MontecarloTreeSearch(None,gameStatus,self.__lvls,self.__haveWhites,0,1)
         self.__engine.setSecPerMove(self.__sec)
         return self.__engine.move()

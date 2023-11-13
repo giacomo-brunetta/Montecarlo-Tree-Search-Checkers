@@ -12,11 +12,13 @@ class Match:
         self.__turn= 0
 
     def move(self, player: Type['Player']) -> None:
+        #print(f"match-deb---------------------player {player.name} has this game status\n{self.__game}")
         newGameStatus= player.move(self.__game, self.__turn)
         if newGameStatus == None:
             self.end()
         else:
             self.__game= newGameStatus
+            print(f"Tew game status after {player.name} move is:\n{self.__game}")
 
     def play(self):
         numPlayers= len(self.__palayers)
@@ -27,6 +29,7 @@ class Match:
             self.move(playerOnMove)
             if self.__isGameOver == True:
                 break
+            
             self.__turn+= 1
 
     def end(self) -> None:

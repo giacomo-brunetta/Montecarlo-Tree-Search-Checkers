@@ -11,28 +11,29 @@ from time import time
 class MontecarloTreeSearch(Node):
     __seconsPerMove= 3
 
-    def explorationExploitationF(wi: int, ni: int, Ni: int, c: float =sqrt(2)):
+    def explorationExploitationF(wi: int, ni: int, Ni: int, c: float =sqrt(2)) -> float:
         assert Ni>=ni and ni>0 and ni>=wi, "impossible parameters, no meaning"
         return wi/ni+c*sqrt(log(Ni)/ni)
     
-    def populateTreeLevel(self):
+    def populateTreeLevel(self) -> None:
         assert len(self.getChildren()) == 0, "metod to populate tree already called on this instance of the board"
         moves= self.getValue().moves(self.__height)
-        prob= 1/len(moves)
-        for possibleMove in moves:
-            self.newChild(MontecarloTreeSearch(possibleMove,self.__n-1,not self.__isWhiteTurn, self.__height+1, prob))
+        if moves!=None:
+            prob= 1/len(moves)
+            for possibleMove in moves:
+                self.newChild(MontecarloTreeSearch(self,possibleMove,self.__n-1,not self.__isWhiteTurn, self.__height+1, prob))
             
-    def populateNLevelsTree(self, n: int):
+    def populateNLevelsTree(self, n: int) -> None:
         if n>0:
             self.populateTreeLevel()
             for child in self.getChildren():
                 child.populateNLevelsTree(n-1)
 
-    def __init__(self, obj: Type['Game'], levelsOfMemory: int, isWhiteTurn: bool, height: int, probability: float):
+    def __init__(self, father: Type['MontecarloTreeSearch'],obj: Type['Game'], levelsOfMemory: int, isWhiteTurn: bool, height: int, probability: float):
         assert levelsOfMemory>=0, "error in MontecarloTreeSearch costruction"
         assert height>=0, "error in MontecarloTreeSearch costruction"
         assert obj!=None, "error in MontecarloTreeSearch costruction"
-        super().__init__(obj)
+        super().__init__(obj,father)
         
         self.__n= levelsOfMemory #keep in memory about 10^4 Board
         self.__isWhiteTurn= isWhiteTurn
@@ -121,7 +122,7 @@ class MontecarloTreeSearch(Node):
                     return 1
             else:
                 #altrimenti chiami sul nodo che hai ottenuto randomVisitAndSave
-                return MontecarloTreeSearch(nextBoard, 0, not self.__isWhiteTurn, self.__height+1, 0).randomVisitAndSave(n)
+                return MontecarloTreeSearch(self,nextBoard, 0, not self.__isWhiteTurn, self.__height+1, 0).randomVisitAndSave(n)
         else:
             raise Exception(f"unmanaged case in winnings tree visit, heigth={self.__height}")
 
@@ -140,8 +141,10 @@ class MontecarloTreeSearch(Node):
                     bestChild= child
             else:
                 bestChild= child
-        for child in self.getChildren():
-            print(f"({child.getProbability()},{child.getWons()}/{child.getNumSimulation()})")
+        #print(f"deb--------------lista di (prbab e vittorie su partite) dei figli, il padre ({self.getProbability()},{self.getWons()}/{self.getNumSimulation()}):")
+        #for child in self.getChildren():
+        #    print(f"({child.getProbability()},{child.getWons()}/{child.getNumSimulation()})")
+        #print(f"deb:---------------tra tutti gli {len(self.getChildren())} figli ho scelto con le statistiche w={bestChild.getWons()} played={bestChild.getNumSimulation()}:\n{bestChild}")
         return bestChild.getValue().copy()
     
     def move(self) -> Type['Game']:

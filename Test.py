@@ -165,22 +165,31 @@ class TestNode(unittest.TestCase):
         with self.assertRaises(Exception):
             str(node11)
 
+    def testFatherReference(self):
+        root= Node(5,None)
+        child0= Node(4,root)
+        child1= Node(4,root)
+        self.assertEqual(child0.getFather(),root)
+        self.assertEqual(child0.getFather(),child1.getFather())
+        self.assertNotEqual(child1.getFather(),None)
+        falseChild= Node(3,child0)
+        with self.assertRaises(Exception):
+            root.newChild(falseChild)
 
     def testNewChild(self):
         node= Node("string value")
         with self.assertRaises(Exception):
             node.newChild("string")
 
-
     def testGetChildren(self):
         node0= Node(11)
-        node0.newChild(Node(12))
-        node0.newChild(Node(13))
+        node0.newChild(Node(12,node0))
+        node0.newChild(Node(13,node0))
         for child, expectedValue in zip(node0.getChildren(),[12,13]):
             self.assertEqual(child.getValue(),expectedValue)
         node1= Node("11")
-        node1.newChild(Node("12"))
-        node1.newChild(Node("13"))
+        node1.newChild(Node("12",node1))
+        node1.newChild(Node("13",node1))
         for child, expectedValue in zip(node1.getChildren(),["12","13"]):
             self.assertEqual(child.getValue(),expectedValue)
         self.assertTrue(len(Node(0).getChildren()) == 0)

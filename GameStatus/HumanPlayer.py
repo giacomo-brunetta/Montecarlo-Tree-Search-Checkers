@@ -8,9 +8,7 @@ class HumanPlayer(Player):
         self.name= name
 
     def move(self, gameStatus: Type['Game'], turn: int) -> Type['Game']:
-        print(f"Dr. {self.name} is your turn. This is the game status")
-        print(gameStatus)
-        print("Insert a number to chose one of the following possible next states")
+        print(f"Dr. {self.name} is your turn. Insert a number to chose one of the following possible next states")
         moves= gameStatus.moves(turn)
         if moves != None:
             for i, mov in enumerate(moves):
