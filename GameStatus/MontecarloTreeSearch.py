@@ -40,7 +40,8 @@ class MontecarloTreeSearch(Node):
         self.__stalemate= 0
         self.__probability= 0
         self.setProbability(probability)
-        self.populateNLevelsTree(self.__n)
+        if height==0:
+            self.populateNLevelsTree(self.__n)
 
     def setSecPerMove(self,t: float) -> None:
         assert t>=0.1
@@ -71,7 +72,7 @@ class MontecarloTreeSearch(Node):
                 sum+= v
                 newValues.append(v)
             #normalize to get a probability
-            for v, child in zip(self.getChildren(),newValues):
+            for child, v in zip(self.getChildren(),newValues):
                 child.setProbability(v/sum)
         
     def randomVisitAndSave(self, n: int) -> int: #won? +1won white -1lost white 0 patta
@@ -112,7 +113,7 @@ class MontecarloTreeSearch(Node):
                 else:
                     return 1
             #altrimenti chiami sul nodo che hai ottenuto randomVisitAndSave
-            MontecarloTreeSearch(nextBoard, 0, not self.__isWhiteTurn, self.__height+1, None).randomVisitAndSave(n)
+            MontecarloTreeSearch(nextBoard, 0, not self.__isWhiteTurn, self.__height+1, 0).randomVisitAndSave(n)
 
     def findNextBestMoove(self) -> Type['Game']:
         # run simulation untill seconds per moves are expired
