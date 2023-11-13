@@ -105,6 +105,7 @@ class Move:
 
 class Checkers(Game):
     name = "Checkers"
+    requiredPlayers = 2
 
     def __init__(self):
         self._board = [
