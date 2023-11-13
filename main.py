@@ -6,7 +6,8 @@ from GameStatus.HumanPlayer import HumanPlayer
 def main():
     gameTable= Checkers()
     human= HumanPlayer("Mario")
-    machine= MontecarloMachinePlayer("Carlo",gameTable,2,5,True)
+    tempGameTablegameTable= gameTable
+    machine= MontecarloMachinePlayer("Carlo",tempGameTablegameTable,1,2,True)#1 profondita, 2 sec per mossa
     humVSmac= Match([machine,human],gameTable)
     humVSmac.play()
     

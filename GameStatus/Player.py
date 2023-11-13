@@ -3,8 +3,8 @@ from typing import Type
 from GameStatus.Game import Game
 
 class Player(ABC):
-    name = None
+    name= None
     
     @abstractmethod
-    def move(self, gameStatus: Type['Game']) -> Type['Game']:
+    def move(self, gameStatus: Type['Game'], turn: int) -> Type['Game']:
         pass

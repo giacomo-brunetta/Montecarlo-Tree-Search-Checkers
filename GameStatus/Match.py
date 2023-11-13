@@ -9,24 +9,27 @@ class Match:
         self.__palayers= players.copy()
         self.__game= initialGameStatus.copy()
         self.__isGameOver= False
+        self.__turn= 0
 
     def move(self, player: Type['Player']) -> None:
-        newGameStatus= player.move(self.__game)
+        print(f"match-deb---------------------player {player.name} has this game status\n{self.__game}")
+        newGameStatus= player.move(self.__game, self.__turn)
         if newGameStatus == None:
             self.end()
         else:
             self.__game= newGameStatus
+            print(f"match-deb-----------------and modify it in this way:\n{self.__game}")
 
     def play(self):
         numPlayers= len(self.__palayers)
-        assert numPlayers>=2
-        i=0
+        assert numPlayers>=self.__game.getMinNumPLayers(), "not enought player for this game"
+        assert numPlayers<=self.__game.getMaxNumPLayers(), "too many player for this game"
         while True:
-            playerOnMove= self.__palayers[i%numPlayers]
+            playerOnMove= self.__palayers[self.__turn%numPlayers]
             self.move(playerOnMove)
-            i+= 1
             if self.__isGameOver == True:
                 break
+            self.__turn+= 1
 
     def end(self) -> None:
         self.__isGameOver= True
