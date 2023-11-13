@@ -105,7 +105,8 @@ class Move:
 
 class Checkers(Game):
     name = "Checkers"
-    requiredPlayers = 2
+    minRequiredPlayers = 2
+    maxRequiredPlayers = 2
 
     def __init__(self):
         self._board = [

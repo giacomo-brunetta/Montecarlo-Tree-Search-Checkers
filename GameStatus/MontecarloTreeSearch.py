@@ -140,10 +140,8 @@ class MontecarloTreeSearch(Node):
                     bestChild= child
             else:
                 bestChild= child
-        print(f"deb--------------lista di (prbab e vittorie su partite) dei figli, il padre ({self.getProbability()},{self.getWons()}/{self.getNumSimulation()}):")
         for child in self.getChildren():
             print(f"({child.getProbability()},{child.getWons()}/{child.getNumSimulation()})")
-        print(f"deb:---------------tra tutti gli {len(self.getChildren())} figli ho scelto con le statistiche w={bestChild.getWons()} played={bestChild.getNumSimulation()}:\n{bestChild}")
         return bestChild.getValue().copy()
     
     def move(self) -> Type['Game']:
