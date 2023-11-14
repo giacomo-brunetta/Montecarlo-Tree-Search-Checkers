@@ -5,10 +5,10 @@ from typing import Type
 
 class HumanPlayer(Player):
     def __init__(self, name: str) -> None:
-        self.name= name
+        self._name= name
 
     def move(self, gameStatus: Type['Game'], turn: int) -> Type['Game']:
-        print(f"Dr. {self.name} is your turn. Insert a number to chose one of the following possible next states")
+        print(f"Dr. {self._name} is your turn. Insert a number to chose one of the following possible next states")
         moves= gameStatus.moves(turn)
         if moves != None:
             for i, mov in enumerate(moves):
@@ -19,10 +19,10 @@ class HumanPlayer(Player):
                     num= int(input("Pick a move or -1 to surrender:"))
                     if num==-1:
                         return None
+                    if num==0 or (num>0 and num<len(moves)):
+                        break    
                 except:
                     print("Error during selection. Insert a valid number")
-                if num==0 or (num>0 and num<len(moves)):
-                    break
             return moves[num].copy()
         else:
             return None

@@ -18,7 +18,7 @@ class Match:
             self.end()
         else:
             self.__game= newGameStatus
-            print(f"Tew game status after {player.name} move is:\n{self.__game}")
+            print(f"Tew game status after {player._name} move is:\n{self.__game}")
 
     def play(self):
         numPlayers= len(self.__palayers)

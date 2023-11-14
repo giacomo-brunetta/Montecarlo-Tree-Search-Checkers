@@ -3,7 +3,7 @@ from typing import Type
 from GameStatus.Game import Game
 
 class Player(ABC):
-    name= None
+    _name= None
     
     @abstractmethod
     def move(self, gameStatus: Type['Game'], turn: int) -> Type['Game']:

@@ -6,7 +6,7 @@ from typing import Type
 
 class MontecarloMachinePlayer(Player):
     def __init__(self, name: str, game: Type['Game'], levelsOfMemory: int, seconsPerMove: float, haveWhites: bool) -> None:
-        self.__name= name
+        self._name= name
         self.__lvls= levelsOfMemory
         self.__sec= seconsPerMove
         self.__haveWhites= haveWhites
