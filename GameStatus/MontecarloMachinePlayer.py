@@ -15,7 +15,7 @@ class MontecarloMachinePlayer(Player):
         self.__engine.setSecPerMove(secondsPerMove)
 
     def move(self, gameStatus: Type['Game'], turn: int) -> Type['Game']:
-        print(f"Loading move...   [{self.__sec}s]")
+        print(f"Loading {self._name}'s move...   [{self.__sec}s]")
         self.__engine= MontecarloTreeSearch(None,gameStatus,self.__lvls,self.__haveWhites,0,1)
         self.__engine.setSecPerMove(self.__sec)
         return self.__engine.move()

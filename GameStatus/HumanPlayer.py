@@ -24,7 +24,7 @@ class HumanPlayer(Player):
         return num
 
     def move(self, gameStatus: Type['Game'], turn: int) -> Type['Game']:
-        print(f"Dr. {self._name} is your turn. Insert a number to chose one of the following possible next states")
+        print(f"It's {self._name}'s turn. Insert a number to chose one of the following possible next states")
         moves = gameStatus.moves(turn)
 
         descriptions = []
