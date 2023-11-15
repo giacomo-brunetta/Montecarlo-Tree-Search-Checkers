@@ -26,7 +26,7 @@ class Node:
 
     def __str__(self) -> str:
         assert hasattr(self.__value,"__str__"), "expected printable elment"
-        assert isinstance(str(self.__value),str), "str() metod doese't return a string"
+        assert type(self.__value) is str, "str() metod doese't return a string"
         return str(self.__value)
 
     def __repr__(self) -> str:

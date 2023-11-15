@@ -15,7 +15,7 @@ class MontecarloTreeSearch(Node):
     def __init__(self, father: Type['MontecarloTreeSearch'],obj: Type['Game'], levelsOfMemory: int, isWhiteTurn: bool, height: int, probability: float):
         assert levelsOfMemory>=0, "error in MontecarloTreeSearch construction"
         assert height>=0, "error in MontecarloTreeSearch construction"
-        assert obj!=None, "error in MontecarloTreeSearch construction"
+        assert obj is not None, "error in MontecarloTreeSearch construction"
         super().__init__(obj,father)
         
         self.__n= levelsOfMemory #keep in memory about 10^4 Board
@@ -29,13 +29,15 @@ class MontecarloTreeSearch(Node):
         if height==0:
             self.populateNLevelsTree(self.__n)
 
-    def verbosity(self, value: bool):
-        self.__verbose = value
+    @classmethod
+    def verbosity(cls, value: bool):
+        assert type(value) is bool
+        cls.__verbose = value
 
     def populateTreeLevel(self) -> None:
         assert len(self.getChildren()) == 0, "method to populate tree already called on this instance of the board"
         moves= self.getValue().moves(self.__height)
-        if moves!=None:
+        if len(moves)!=0:
             prob= 1/len(moves)
             for possibleMove in moves:
                 self.newChild(MontecarloTreeSearch(self,possibleMove,self.__n-1,not self.__isWhiteTurn, self.__height+1, prob))
@@ -46,9 +48,10 @@ class MontecarloTreeSearch(Node):
             for child in self.getChildren():
                 child.populateNLevelsTree(n-1)
 
-    def setSecPerMove(self,t: float) -> None:
+    @classmethod
+    def setSecPerMove(cls,t: float) -> None:
         assert t>=0.1
-        self.__seconsPerMove= t
+        cls.__seconsPerMove= t
     
     def getNumSimulation(self) -> int:
         return self.__wons + self.__losses + self.__stalemate
@@ -66,16 +69,16 @@ class MontecarloTreeSearch(Node):
         assert p>=0 and p<=1, "probability out of bound, cant have a negative or grater than one probability"
         self.__probability= p
     
-    def explorationExploitationF(self,wi: int, ni: int, Ni: int, c: float =sqrt(2)) -> float:
-        assert Ni>=ni and ni>=0 and ni>=wi and c>=0, f"impossible parameters, no meaning wi={wi} ni={ni} Ni={Ni} c={c}"
-        return (wi/(ni+1)+c*sqrt(log(Ni+1)/(ni+1)))
+    def explorationExploitationF(self, li: int, ni: int, Ni: int, c: float =sqrt(2)) -> float:
+        assert Ni>=ni and ni>=0 and ni>=li and c>=0, f"impossible parameters, no meaning wi={li} ni={ni} Ni={Ni} c={c}"
+        return (li/(ni+1)+c*sqrt(log(Ni+1)/(ni+1)))
 
     def __refreshProbabilityes(self):
         if self.getNumSimulation()>0:
             sum=0
             newValues= []
             for child in self.getChildren():
-                v= self.explorationExploitationF(child.getWons(), child.getNumSimulation(), self.getNumSimulation())
+                v= self.explorationExploitationF(child.getLosses(), child.getNumSimulation(), self.getNumSimulation())
                 assert v!=0, "exploration exploitation formula, returned 0, error"
                 sum+= v
                 newValues.append(v)
@@ -122,7 +125,7 @@ class MontecarloTreeSearch(Node):
             #farma un unico nodo a caso con la funzione di farming singola e crea un nodo di altezza ++
             nextBoard= self.getValue().randomMove(self.__height)
             #se il nodo farmato è None allora hai finito e ha perso isWhiteTurn quindi ritorni -1 se era bianco o +1 se nero
-            if nextBoard==None:
+            if nextBoard is None:
                 if self.__isWhiteTurn==True:
                     return -1
                 else:
@@ -134,30 +137,36 @@ class MontecarloTreeSearch(Node):
             raise Exception(f"unmanaged case in winnings tree visit, heigth={self.__height}")
 
     def findNextBestMove(self) -> Type['Game']:
-        # run simulation untill seconds per moves are expired
-        startTime= time()
-        while True:
-            for i in range(50): #for50 because I don't want to wast CPU resources cecking the time after every simulation
-                self.randomVisitAndSave(self.__n)
-            if time() > startTime+self.__seconsPerMove:
-                break
-        #I choose the more winning move above all the childs
-        worstChild= None
-        for child in self.getChildren():
-            if worstChild!=None:
-                if child.getLosses() > worstChild.getWons():
+        children= self.getChildren()
+        if len(children)==1:
+            return children[0].getValue().copy()
+        elif len(children)==0:
+            return None
+        else:
+            # run simulation untill seconds per moves are expired
+            startTime= time()
+            while True:
+                for i in range(50): #for50 because I don't want to wast CPU resources cecking the time after every simulation
+                    self.randomVisitAndSave(self.__n)
+                if time() > startTime+self.__seconsPerMove:
+                    break
+            #I choose the more winning move above all the childs
+            worstChild= None
+            for child in children:
+                if worstChild is not None:
+                    if child.getLosses() > worstChild.getLosses():
+                        worstChild= child
+                else:
                     worstChild= child
-            else:
-                worstChild= child
-        if self.__verbose:
-            print("mts-deb-simulation results:---------------------------------------")
-            print(f"mts-deb:  h={self.__height} W={self.getWons()} s={self.__stalemate} L={self.__losses}")
-            for child in self.getChildren():
-                print(f" mts-deb:  h={child.__height} W={child.getWons()} s={child.__stalemate} L={child.__losses} Prob={round(child.getProbability(),2)}")
-                for child2 in child.getChildren():
-                    print(f"    mts-deb:  h={child2.__height} W={child2.getWons()} s={child2.__stalemate} L={child2.__losses} Prob={round(child2.getProbability(),2)}")
-            
-        return worstChild.getValue().copy()
+            if self.__verbose==True:
+                print("mts-deb-simulation results:---------------------------------------")
+                print(f"mts-deb:  h={self.__height} W={self.getWons()} s={self.__stalemate} L={self.__losses}")
+                for child in children:
+                    print(f" mts-deb:  h={child.__height} W={child.getWons()} s={child.__stalemate} L={child.__losses} Prob={round(child.getProbability(),2)}")
+                    for child2 in children:
+                        print(f"    mts-deb:  h={child2.__height} W={child2.getWons()} s={child2.__stalemate} L={child2.__losses} Prob={round(child2.getProbability(),2)}")
+                
+            return worstChild.getValue().copy()
     
     def move(self) -> Type['Game']:
         playerTurn= self.__isWhiteTurn
@@ -165,3 +174,13 @@ class MontecarloTreeSearch(Node):
         self.__isWhiteTurn= playerTurn
         return mov
     
+    '''# for debug purpose to check if the deallocation is working. It is.
+    def __del__(self):
+        if self.__verbose==True:
+            print(f"deb: Level {self.__height} ",end="")
+            if self.__isWhiteTurn==True:
+                print("white",end="")
+            else:
+                print("black",end="")
+            print(" node destroyed")
+    '''
