@@ -18,11 +18,11 @@ class Match:
             self.end()
         else:
             self.__game= newGameStatus
-            print(f"Tew game status after {player._name} move is:\n{self.__game}")
+            print(f"The game status after {player._name} move is:\n{self.__game}")
 
     def play(self):
         numPlayers= len(self.__palayers)
-        assert numPlayers>=self.__game.getMinNumPLayers(), "not enought player for this game"
+        assert numPlayers>=self.__game.getMinNumPLayers(), "not enough players for this game"
         assert numPlayers<=self.__game.getMaxNumPLayers(), "too many player for this game"
         while True:
             playerOnMove= self.__palayers[self.__turn%numPlayers]
