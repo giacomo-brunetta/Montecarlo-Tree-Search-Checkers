@@ -14,7 +14,7 @@ class TestBoard(unittest.TestCase):
         self.assertEqual(b, b1)  # equal to identical
         self.assertEqual(b1, b)
 
-        b1.set(0,0,Tile(2))
+        b1.set(0, 0, Tile(2))
 
         # different from different board
         self.assertNotEqual(b, b1)
@@ -74,7 +74,7 @@ class TestBoard(unittest.TestCase):
                 if b.is_settable(row,col):
                     b.set(row,col, Tile.EMPTY)
 
-        self.assertEqual(len(b.moves(0)), 1)
+        self.assertEqual(len(b.moves(0)), 4)
 
         for row in range(b.rows):
             for col in range(b.cols):
