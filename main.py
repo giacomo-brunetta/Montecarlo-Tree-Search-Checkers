@@ -14,6 +14,14 @@ MOTD = """
 ╚═╝     ╚══════╝╚═╝  ╚═╝   ╚═╝       ╚═╝     ╚═╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚══════╝     ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝ ╚═════╝                                                                                                                                                                                                                                                                        
 """
 
+help_message = """--Verbose (-v) to see logging about Montecarlo Simulation
+--Game (-g) = <Name of the game> to choose the game
+--Players (-p) = <type of players> one letter per player. m for machine, h for human, t for test
+--Memory (-m)  =  levels of the Tree to keep in memory (default = 4)
+--Seconds (-s) = seconds per move. The more seconds, the more the bot gets strong (default = 5)
+
+Try standard: -g Checkers -p mh
+        """
 
 def main():
     argumentList = sys.argv[1:]
@@ -39,17 +47,8 @@ def main():
         for currentArgument, currentValue in arguments:
 
             if currentArgument in ("-h", "--Help"):
-
-                help_message = """--Verbose (-v) to see logging about Montecarlo Simulation
---Game (-g) = <Name of the game> to choose the game
---Players (-p) = <type of players> one letter per player. m for machine, h for human, t for test
---Memory (-m)  =  levels of the Tree to keep in memory (default = 4)
---Seconds (-s) = seconds per move. The more seconds, the more the bot gets strong (default = 5)
-
-Try standard: -g Checkers -p mh
-        """
                 print(help_message)
-                raise Exception()
+                sys.exit(0)
 
             elif currentArgument in ("-g", "--Game"):
                 if currentValue == "Checkers":
@@ -89,11 +88,11 @@ Try standard: -g Checkers -p mh
                 else:
                     raise "Invalid player type! h: human, m: machine, t: test (stub)"
         else:
-            print("Please specify players!")
-            sys.exit(0)
+            raise Exception("Please specify players!")
 
     except Exception as e:
         print(e)
+        print("Too see options use --Help (-h)")
         sys.exit(0)
 
     print("BEGIN of the match!")

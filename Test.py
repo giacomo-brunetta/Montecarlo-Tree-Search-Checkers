@@ -99,17 +99,13 @@ class TestBoard(unittest.TestCase):
         b.set(5, 1, Tile.BLACK_CHECKER)
         self.assertEqual(len(b.moves(0)), 1)
 
-    """
-    def testRandom(self):
-        board = Checkers()
-        whiteTurn = False
-
-        for i in range(30):
-            board = board.randomMove(whiteTurn)
-            whiteTurn = not whiteTurn
-            print(board)
-            print(f"{i} ----------------------------")
-    """
+    def testImSpeed(self):
+        b = Checkers()
+        for i in range(1000):
+            moves = b.randomMove(i)
+            if moves is None:
+                b = Checkers()
+            b = b.moves(i)[0]
 
 class TestNode(unittest.TestCase):
     def testGetValue(self):
