@@ -38,7 +38,7 @@ class HumanPlayer(Player):
     def move(self, gameStatus: Type['Game'], turn: int) -> Type['Game']:
         print(f"It's {self._name}'s turn. Insert a number to chose one of the following possible next states")
         moves = gameStatus.moves(turn)
-        if moves is not None:
+        if len(moves)!=0:
             self.__showMoves(moves)
             num = self.__playerChoice(len(moves))
             if num == -1:

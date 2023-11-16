@@ -8,3 +8,6 @@ class Player(ABC):
     @abstractmethod
     def move(self, gameStatus: Type['Game'], turn: int) -> Type['Game']:
         pass
+
+    def __str__(self):
+        return str(self._name)

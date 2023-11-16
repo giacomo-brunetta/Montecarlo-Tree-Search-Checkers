@@ -89,9 +89,14 @@ class MontecarloTreeSearch(Node):
             raise Exception("can not refresh probabilityes before running a simulation")
         
     def randomVisitAndSave(self, n: int) -> int: #won? +1won white -1lost white 0 patta
-        assert n>=0 and self.__height>=0
-        if self.__height>=0 and self.__height<n:
-            assert len(self.getChildren())>0, "cant refresh probability and pick a child. No child found for this node"
+        assert n>0, "you must have at least one layer of memory (n=1) to chose the next move"
+        assert self.__height>=0, "Negative node height, problem in node creation"
+        if len(self.getChildren())==0: #"No child found for this node. Lost."
+            if self.__isWhiteTurn==True:
+                return -1
+            else:
+                return 1
+        elif self.__height>=0 and self.__height<n:
             #scegli uno a caso U in base alle probabilità
             r= random()
             probIntervalBottom= 0
