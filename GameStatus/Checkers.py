@@ -29,8 +29,6 @@ class Move:
         if other is None:
             return False
 
-        assert type(other) == Move
-
         if self.count() < other.count():
             return True
 
@@ -56,8 +54,6 @@ class Move:
     def __gt__(self, other):
         if other is None:
             return True
-
-        assert type(other) == Move
 
         if self.count() > other.count():
             return True
@@ -85,9 +81,6 @@ class Move:
         if other is None:
             return False
 
-        if type(other) != Move:
-            return False
-
         if self.count() != other.count() or self.count_kings() != other.count_kings():
             return False
 
@@ -110,55 +103,61 @@ class Checkers(Game):
     branchingFactor= 7
 
     def __init__(self):
-        self._board = [
-            [Tile.WHITE_CHECKER, Tile.EMPTY, Tile.WHITE_CHECKER, Tile.EMPTY, Tile.WHITE_CHECKER, Tile.EMPTY, Tile.WHITE_CHECKER, Tile.EMPTY],
-            [Tile.EMPTY, Tile.WHITE_CHECKER, Tile.EMPTY, Tile.WHITE_CHECKER, Tile.EMPTY, Tile.WHITE_CHECKER, Tile.EMPTY, Tile.WHITE_CHECKER],
-            [Tile.WHITE_CHECKER, Tile.EMPTY, Tile.WHITE_CHECKER, Tile.EMPTY, Tile.WHITE_CHECKER, Tile.EMPTY, Tile.WHITE_CHECKER, Tile.EMPTY],
-            [Tile.EMPTY, Tile.EMPTY, Tile.EMPTY, Tile.EMPTY, Tile.EMPTY, Tile.EMPTY, Tile.EMPTY, Tile.EMPTY],
-            [Tile.EMPTY, Tile.EMPTY, Tile.EMPTY, Tile.EMPTY, Tile.EMPTY, Tile.EMPTY, Tile.EMPTY, Tile.EMPTY],
-            [Tile.EMPTY, Tile.BLACK_CHECKER, Tile.EMPTY, Tile.BLACK_CHECKER, Tile.EMPTY, Tile.BLACK_CHECKER, Tile.EMPTY, Tile.BLACK_CHECKER],
-            [Tile.BLACK_CHECKER, Tile.EMPTY, Tile.BLACK_CHECKER, Tile.EMPTY, Tile.BLACK_CHECKER, Tile.EMPTY, Tile.BLACK_CHECKER, Tile.EMPTY],
-            [Tile.EMPTY, Tile.BLACK_CHECKER, Tile.EMPTY, Tile.BLACK_CHECKER, Tile.EMPTY, Tile.BLACK_CHECKER, Tile.EMPTY, Tile.BLACK_CHECKER]
-        ]
-        self.rows = len(self._board)
-        self.cols = len(self._board[0])
+        self.__board = [[Tile.WHITE_CHECKER] * 4,
+                        [Tile.WHITE_CHECKER] * 4,
+                        [Tile.WHITE_CHECKER] * 4,
+                        [Tile.EMPTY] * 4,
+                        [Tile.EMPTY] * 4,
+                        [Tile.EMPTY] * 4,
+                        [Tile.BLACK_CHECKER] * 4,
+                        [Tile.BLACK_CHECKER] * 4,
+                        [Tile.BLACK_CHECKER] * 4]
+        self.rows = 8
+        self.cols = 8
 
     def copy(self) -> Type['Checkers']:
         checkers_copy = Checkers()
-        checkers_copy._board = [[element for element in line] for line in self._board]
+        checkers_copy.__board = [[element for element in line] for line in self.__board]
         return checkers_copy
+
+    def in_bounds(self, row: int, col: int) -> bool:
+        return row < self.rows and row >= 0 and col < self.cols and col >= 0
 
     def is_white_turn(self, turn:int):
         return turn % 2 == 0
 
-    def is_settable(self, row:int, col:int):
+    def is_settable(self, row: int, col:int):
         return self.in_bounds(row, col) and (row + col) % 2 == 0
 
     def get(self, row: int, col: int) -> Tile:
-        assert self.in_bounds(row,col), "Index of bounds for board"
-        return self._board[row][col]
+        # assert self.in_bounds(row, col), "Index of bounds for board"
+        if (row + col) % 2 == 1:
+            return Tile.EMPTY
+
+        col_mapped = int((col - (row % 2)) / 2)
+        return self.__board[row][col_mapped]
 
     def set(self, row: int, col: int, piece: Tile):
         assert self.is_settable(row, col), "Cannot set this cell"
-        self._board[row][col] = piece
+        col_mapped = int((col - (row % 2)) / 2)
+        self.__board[row][col_mapped] = piece
 
 
     def _check_for_upgrade(self, row: int, col: int):
         if row != 0 and row != self.cols - 1:
             return
-        piece = self._board[row][col]
+        piece = self.get(row, col)
         if piece.is_checker():
             if piece.is_white() and row == self.rows-1:
-                self._board[row][col] = Tile.WHITE_KING
+                self.set(row, col, Tile.WHITE_KING)
             if piece.is_black() and row == 0:
-                self._board[row][col] = Tile.BLACK_KING
+                self.set(row, col, Tile.BLACK_KING)
 
     def __repr__(self) -> str:
         string = ""
         for i in range(self.rows):
-
             for j in range(self.cols):
-                tile = self._board[i][j]
+                tile = self.get(i, j)
                 if tile.is_empty():
                     string += "🟨" if (i+j) % 2 == 0 else "🟩"
                 else:
@@ -174,25 +173,15 @@ class Checkers(Game):
         if type(other) != type(self):
             return False
 
-        rows = len(self._board)
-        cols = len(self._board[0])
-
-        # have the same shape
-        if not rows == len(other._board) or not cols == len(other._board[0]):
-            return False
-
         # check that every pos is equal
-        for i in range(rows):
-            for j in range(cols):
-                if self._board[i][j] != other._board[i][j]:
+        for i in range(int(self.rows)):
+            for j in range(int(self.cols)):
+                if self.get(i, j) != other.get(i, j):
                     return False
         return True
 
     def __ne__(self, other):
         return not self.__eq__(other)
-
-    def in_bounds(self, row: int, col: int) -> bool:
-        return row < self.rows and row >= 0 and col < self.cols and col >= 0
 
     def __move_on_or_eat(self, row: int, col: int, piece: Tile):
         assert self.in_bounds(row, col)
@@ -220,16 +209,16 @@ class Checkers(Game):
 
     def __move_piece(self, row: int, col: int) -> List["Move"]:
         assert self.in_bounds(row, col)
-        piece = self._board[row][col]
+        piece = self.get(row, col)
         possible_positions = self.__move_on_or_eat(row, col, piece)
         valid_moves = []
         for pos in possible_positions:
-                if self.in_bounds(pos[0], pos[1]) and self._board[pos[0]][pos[1]] == Tile.EMPTY:
-                    board_with_move = self.copy()
-                    board_with_move.set(row, col, Tile.EMPTY)
-                    board_with_move.set(pos[0], pos[1], piece)
-                    board_with_move._check_for_upgrade(pos[0], pos[1])
-                    valid_moves.append(board_with_move)
+            if self.in_bounds(pos[0], pos[1]) and self.get(pos[0], pos[1]) == Tile.EMPTY:
+                board_with_move = self.copy()
+                board_with_move.set(row, col, Tile.EMPTY)
+                board_with_move.set(pos[0], pos[1], piece)
+                board_with_move._check_for_upgrade(pos[0], pos[1])
+                valid_moves.append(board_with_move)
 
         return [Move(move, []) for move in valid_moves]
 
@@ -238,9 +227,8 @@ class Checkers(Game):
         respect_power_of_pieces = piece.is_king() or target.is_checker()
         return different_color and respect_power_of_pieces and landing.is_empty()
 
-    def jumps(self, row: int, col: int, eaten_before: List["Tile"] = []) -> List["Move"]:
-        assert self.in_bounds(row, col)
-        piece = self._board[row][col]
+    def _jumps(self, row: int, col: int, eaten_before: List["Tile"] = []) -> List["Move"]:
+        piece = self.get(row, col)
         to_eat = self.__move_on_or_eat(row, col, piece)
         to_land_on = self.__land_on(row, col, piece)
 
@@ -254,8 +242,8 @@ class Checkers(Game):
             if self.in_bounds(landing_pos[0], landing_pos[1]):
 
                 # cannot eat same color and landing needs to empty
-                target = self._board[target_pos[0]][target_pos[1]]
-                landing = self._board[landing_pos[0]][landing_pos[1]]
+                target = self.get(target_pos[0], target_pos[1])
+                landing = self.get(landing_pos[0], landing_pos[1])
 
                 if self.__valid_jump(piece, target, landing):
 
@@ -266,7 +254,7 @@ class Checkers(Game):
                     new_board.set(landing_pos[0], landing_pos[1], piece)
 
                     # call jump recursively
-                    further_jumps = new_board.jumps(landing_pos[0], landing_pos[1], eaten_before + [target])
+                    further_jumps = new_board._jumps(landing_pos[0], landing_pos[1], eaten_before + [target])
 
                     # the upgrade to king is done only after the recursive call
                     new_board._check_for_upgrade(landing_pos[0], landing_pos[1])
@@ -285,28 +273,27 @@ class Checkers(Game):
         max_jump = None
 
         for row in range(self.rows):
-            for col in range(self.cols):
-                if self.is_settable(row, col):
-                    piece = self._board[row][col]
+            for col in range(row % 2, self.cols, 2):  # only valid tiles
+                piece = self.get(row,col)
 
-                    # the piece belong to the player that moves this turn
-                    if (piece.is_white() and isWhiteTurn) or (piece.is_black() and not isWhiteTurn):
-                        # eval jump moves
-                        jump_moves = self.jumps(row, col)
-                        if len(jump_moves) > 0:
-                            # if new best is found clear list and update the best
-                            if max(jump_moves) > max_jump:
-                                max_jump = max(jump_moves)
-                                moves.clear()
+                # the piece belong to the player that moves this turn
+                if (piece.is_white() and isWhiteTurn) or (piece.is_black() and not isWhiteTurn):
+                    # eval jump moves
+                    jump_moves = self._jumps(row, col)
+                    if len(jump_moves) > 0:
+                        # if new best is found clear list and update the best
+                        if max(jump_moves) > max_jump:
+                            max_jump = max(jump_moves)
+                            moves.clear()
 
-                            # append only the best moves
-                            for move in jump_moves:
-                                if move == max_jump:
-                                    moves.append(move)
+                        # append only the best moves
+                        for move in jump_moves:
+                            if move == max_jump:
+                                moves.append(move)
 
-                        # if no jumps are available, eval simple moves
-                        if max_jump is None:
-                            moves += self.__move_piece(row, col)
+                    # if no jumps are available, eval simple moves
+                    if max_jump is None:
+                        moves += self.__move_piece(row, col)
 
         return [move.get_status() for move in moves]
 
