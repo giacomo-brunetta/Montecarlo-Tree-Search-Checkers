@@ -107,6 +107,7 @@ class Checkers(Game):
     name = "Checkers"
     minRequiredPlayers = 2
     maxRequiredPlayers = 2
+    branchingFactor= 7
 
     def __init__(self):
         self._board = [
