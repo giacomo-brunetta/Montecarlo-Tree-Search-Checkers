@@ -89,7 +89,17 @@ class MontecarloTreeSearch(Node):
                 child.setProbability(v/sum)
         else:
             raise Exception("can not refresh probabilityes before running a simulation")
-        
+    
+    def __updateStatus(self,result):
+        if result==0:
+            self.__stalemate +=1
+        elif (result==1 and self.__isWhiteTurn==True) or (result==-1 and self.__isWhiteTurn==False):
+            self.__wons+= 1
+        elif (result==-1 and self.__isWhiteTurn==True) or (result==1 and self.__isWhiteTurn==False):
+            self.__losses+= 1
+        else:
+            raise Exception(f"unmanaged case in winnings and losses. Res={result} isWhite={self.__isWhiteTurn}")
+
     def randomVisitAndSave(self, n: int) -> int: #won? +1won white -1lost white 0 patta
         assert n>0, "you must have at least one layer of memory (n=1) to chose the next move"
         assert self.__height>=0, "Negative node height, problem in node creation"
@@ -110,22 +120,14 @@ class MontecarloTreeSearch(Node):
             #randomvisit U
             #print(f"deb-------------chosen child:\n{chosenChild}")
             if chosenChild is None: #"No child found for this node. Lost."
-                print("deb:------------ chosenChild is None")
+                if self.verbosity==True:
+                    print("deb:------------ there MIGHT be an error, chosenChild is None.")
                 if self.__isWhiteTurn==True:
                     return -1
                 else:
                     return 1
             result= chosenChild.randomVisitAndSave(n)
-            #print(f"deb-------------res={result}")
-            #se true incrementa le tue vincite, se false le tue perdite
-            if result==0:
-                self.__stalemate +=1
-            elif (result==1 and self.__isWhiteTurn==True) or (result==-1 and self.__isWhiteTurn==False):
-                self.__wons+= 1
-            elif (result==-1 and self.__isWhiteTurn==True) or (result==1 and self.__isWhiteTurn==False):
-                self.__losses+= 1
-            else:
-                raise Exception(f"unmanaged case in winnings and losses. Res={result} isWhite={self.__isWhiteTurn}")
+            self.__updateStatus(result)
             self.__refreshProbabilityes()
             return result
         elif self.__height>=80:#sarebbe 40 da quando non varia più il numero dei pezzi ma pace
@@ -143,14 +145,7 @@ class MontecarloTreeSearch(Node):
                 #altrimenti chiami sul nodo che hai ottenuto randomVisitAndSave
                 result= MontecarloTreeSearch(self,nextBoard, 0, not self.__isWhiteTurn, self.__height+1, 0).randomVisitAndSave(n)
                 if self.__height==n:
-                    if result==0:
-                        self.__stalemate +=1
-                    elif (result==1 and self.__isWhiteTurn==True) or (result==-1 and self.__isWhiteTurn==False):
-                        self.__wons+= 1
-                    elif (result==-1 and self.__isWhiteTurn==True) or (result==1 and self.__isWhiteTurn==False):
-                        self.__losses+= 1
-                    else:
-                        raise Exception(f"unmanaged case in winnings and losses. Res={result} isWhite={self.__isWhiteTurn}")
+                    self.__updateStatus(result)
                 return result
         else:
             raise Exception(f"unmanaged case in winnings tree visit, heigth={self.__height}")
@@ -163,18 +158,10 @@ class MontecarloTreeSearch(Node):
         else:
             # run simulation untill seconds per moves are expired
             startTime= time()
-            if self.__verbose==False:
-                while True:
-                    for i in range(50): #for50 because I don't want to wast CPU resources cecking the time after every simulation
-                        self.randomVisitAndSave(self.__n)
-                    if time() > startTime+self.__maxSeconsPerMove:
-                        break
-            else:
-                print(f"deb: n_simulaz= {30*self.getValue().getBranchingFactor()**self.__n}")
-                for i in range(30*self.getValue().getBranchingFactor()**self.__n): 
-                    self.randomVisitAndSave(self.__n)
-                if self.__verbose==True:
-                    print(f"Time used: {time()-startTime}sec")
+            for i in range(30*self.getValue().getBranchingFactor()**self.__n): 
+                self.randomVisitAndSave(self.__n)
+            if self.__verbose==True:
+                print(f"Time used: {time()-startTime}sec")
             #I choose the more winning move above all the childs
             worstChild= None
             for child in self.getChildren():
