@@ -7,7 +7,7 @@ def main():
     gameTable= Checkers()
     human= HumanPlayer("Mario")
     tempGameTablegameTable= gameTable
-    machine= MontecarloMachinePlayer("Carlo",tempGameTablegameTable,4,10,True,True)#4 profondita (7 inizia a essere tantino), 30 sec per mossa
+    machine= MontecarloMachinePlayer("Carlo",tempGameTablegameTable,2,5,True,False)#4 profondita (7 inizia a essere tantino), 30 sec per mossa
     humVSmac= Match([machine,human],gameTable)
     humVSmac.play()
     
