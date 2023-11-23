@@ -2,7 +2,7 @@ from typing import List, Type
 
 class Node:
     def __init__(self, obj, fatherReference: Type['Node']= None):
-        self.__father = fatherReference
+        self.__father= fatherReference
         self.__value = obj
         self.__children = []
 
