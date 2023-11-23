@@ -6,18 +6,11 @@ from os import system
 
 #il puntatore al padre non serve perché usi la ricorsione
 def main():
-    system('clear')
-    while True:
-        try:
-            smartness= int(input("Select smartness from 1 to 8 (the bigger it is the smarter it plays, but it will take longer to choose the move): "))
-            if smartness>=1 and smartness<=8:
-                break
-        except:
-            exit(-1)
+    smartness = 2
 
     gameTable= Checkers()
-    machine=  MontecarloMachinePlayer("PrimoGiocatore1",smartness,4,2,True)#4 profondita (7 inizia a essere tantino), 30 sec per mossa
-    nothuman= MontecarloMachinePlayer("SecondoGiocatore2",smartness,8,2,True)#HumanPlayer("Mario")
+    machine=  MontecarloMachinePlayer("PrimoGiocatore1",smartness,1,2,verbose= False)#4 profondita (7 inizia a essere tantino), 30 sec per mossa
+    nothuman= MontecarloMachinePlayer("SecondoGiocatore2",smartness,1,2, verbose=False)#HumanPlayer("Mario")
     humVSmac= Match([machine,nothuman],gameTable)
     humVSmac.play() 
 

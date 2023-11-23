@@ -29,6 +29,9 @@ class Move:
         if other is None:
             return False
 
+        if other is self:
+            return False
+
         if self.count() < other.count():
             return True
 
@@ -54,6 +57,9 @@ class Move:
     def __gt__(self, other):
         if other is None:
             return True
+
+        if other is self:
+            return False
 
         if self.count() > other.count():
             return True
@@ -81,6 +87,9 @@ class Move:
         if other is None:
             return False
 
+        if other is self:
+            return True
+
         if self.count() != other.count() or self.count_kings() != other.count_kings():
             return False
 
@@ -102,23 +111,24 @@ class Checkers(Game):
     maxRequiredPlayers = 2
     branchingFactor= 7
 
-    def __init__(self):
-        self.__board = [[Tile.WHITE_CHECKER] * 4,
-                        [Tile.WHITE_CHECKER] * 4,
-                        [Tile.WHITE_CHECKER] * 4,
-                        [Tile.EMPTY] * 4,
-                        [Tile.EMPTY] * 4,
-                        [Tile.EMPTY] * 4,
-                        [Tile.BLACK_CHECKER] * 4,
-                        [Tile.BLACK_CHECKER] * 4,
-                        [Tile.BLACK_CHECKER] * 4]
+    def __init__(self, board=None):
+        if board is None:
+            self.__board = [[Tile.WHITE_CHECKER] * 4,
+                            [Tile.WHITE_CHECKER] * 4,
+                            [Tile.WHITE_CHECKER] * 4,
+                            [Tile.EMPTY] * 4,
+                            [Tile.EMPTY] * 4,
+                            [Tile.EMPTY] * 4,
+                            [Tile.BLACK_CHECKER] * 4,
+                            [Tile.BLACK_CHECKER] * 4,
+                            [Tile.BLACK_CHECKER] * 4]
+        else:
+            self.__board = [line.copy() for line in board]
         self.rows = 8
         self.cols = 8
 
     def copy(self) -> Type['Checkers']:
-        checkers_copy = Checkers()
-        checkers_copy.__board = [[element for element in line] for line in self.__board]
-        return checkers_copy
+        return Checkers(self.__board)
 
     def in_bounds(self, row: int, col: int) -> bool:
         return row < self.rows and row >= 0 and col < self.cols and col >= 0
@@ -241,10 +251,10 @@ class Checkers(Game):
             # both target and landing need to be in bounds. Checking for landing is sufficient
             if self.in_bounds(landing_pos[0], landing_pos[1]):
 
-                # cannot eat same color and landing needs to empty
                 target = self.get(target_pos[0], target_pos[1])
                 landing = self.get(landing_pos[0], landing_pos[1])
 
+                # cannot eat same color and landing needs to empty
                 if self.__valid_jump(piece, target, landing):
 
                     # create a new board and perform the jump
@@ -274,16 +284,17 @@ class Checkers(Game):
 
         for row in range(self.rows):
             for col in range(row % 2, self.cols, 2):  # only valid tiles
-                piece = self.get(row,col)
+                piece = self.get(row, col)
 
                 # the piece belong to the player that moves this turn
                 if (piece.is_white() and isWhiteTurn) or (piece.is_black() and not isWhiteTurn):
-                    # eval jump moves
-                    jump_moves = self._jumps(row, col)
+                    # Move is a class that supports comparators so ==, >, max() are overloaded
+                    jump_moves = self._jumps(row, col)  # eval jump moves.
                     if len(jump_moves) > 0:
                         # if new best is found clear list and update the best
-                        if max(jump_moves) > max_jump:
-                            max_jump = max(jump_moves)
+                        temp_max = max(jump_moves)
+                        if temp_max > max_jump:
+                            max_jump = temp_max
                             moves.clear()
 
                         # append only the best moves
@@ -292,7 +303,7 @@ class Checkers(Game):
                                 moves.append(move)
 
                     # if no jumps are available, eval simple moves
-                    if max_jump is None:
+                    elif max_jump is None:
                         moves += self.__move_piece(row, col)
 
         return [move.get_status() for move in moves]
@@ -303,3 +314,15 @@ class Checkers(Game):
             return None
         rnd = randint(0, len(valid_moves)-1)
         return valid_moves[rnd]
+
+    def heuristic(self):
+        white_score = 0
+        black_score = 0
+        for row in range(self.rows):
+            for col in range(row % 2, self.cols, 2):
+                piece = self.get(row,col)
+                if piece.is_white():
+                    white_score += 2.2 if piece.is_king() else 1
+                elif piece.is_black():
+                    black_score += 2.2 if piece.is_king() else 1
+        return white_score - black_score
