@@ -137,20 +137,23 @@ class MontecarloTreeSearch(Node):
             self.__updateStatus(myTurn, whoEndedGame, didWin)
             self.__refreshProbabilityes()
             return whoEndedGame, didWin
-        elif self.__height>=80:#sarebbe 40 da quando non varia più il numero dei pezzi ma pace
-            return myTurn%self.__numPlayers, 0
-        elif self.__height>=n and self.__height<80:#altezza menouno significa che non è da salvare il risultato
-            #farma un unico nodo a caso con la funzione di farming singola e crea un nodo di altezza ++
+        elif self.__height==n:#itertive simulation without memory saves in the tree
+            count= self.__height
+            turn= myTurn
             nextBoard= self.getValue().randomMove(myTurn)
-            #se il nodo farmato è None allora hai finito e ha perso isWhiteTurn quindi ritorni -1 se era bianco o +1 se nero
-            if nextBoard is None:
-                return myTurn%self.__numPlayers, -1
+            while count<80 and nextBoard is not None:
+                count+= 1
+                turn= (turn+1)%self.__numPlayers
+                nextBoard= nextBoard.randomMove(turn) #random farm board to randomly evolve the game
+            whoEndedGame= turn%self.__numPlayers
+            if count==80:#Stalemate case
+                didWin= 0
+            elif nextBoard is None:#the turn player lost
+                didWin= -1
             else:
-                #altrimenti chiami sul nodo che hai ottenuto randomVisitAndSave
-                whoEndedGame, didWin= MontecarloTreeSearch(self,nextBoard, 0, self.__numPlayers, self.__height+1, (self.__turn+1)%self.__numPlayers, 0).randomVisitAndSave(n,(myTurn+1)%self.__numPlayers)
-                if self.__height==n:
-                    self.__updateStatus(myTurn, whoEndedGame, didWin)
-                return whoEndedGame, didWin
+                raise Exception("unmanaged case in while cicle no-memory simulations")
+            self.__updateStatus(myTurn, whoEndedGame, didWin)
+            return whoEndedGame, didWin
         else:
             raise Exception(f"unmanaged case in winnings tree visit, heigth={self.__height}")
 
