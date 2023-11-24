@@ -129,7 +129,6 @@ class Checkers(Game):
                             [WHITE_CHECKER] * 4,
                             [EMPTY] * 4,
                             [EMPTY] * 4,
-                            [EMPTY] * 4,
                             [BLACK_CHECKER] * 4,
                             [BLACK_CHECKER] * 4,
                             [BLACK_CHECKER] * 4]
