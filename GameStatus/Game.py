@@ -28,5 +28,9 @@ class Game(ABC):
         pass
 
     @abstractmethod
+    def heuristic(self, turn: int) -> float:
+        pass
+
+    @abstractmethod
     def copy() -> Type['Game']:
         pass
