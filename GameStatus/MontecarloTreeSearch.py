@@ -141,17 +141,40 @@ class MontecarloTreeSearch(Node):
             count= self.__height
             turn= myTurn
             nextBoard= self.getValue().randomMove(myTurn)
-            while count<80 and nextBoard is not None:
+            #guardi 4 mosse aventi e vedi con l'euristica se sei in vantaggio,
+            #poi fai altru due mosse e vedi se rimani comunque in vantaggi
+            #continui ad andare avanti di 2 in 2 finche per 2 volte consecutive il vantaggio si assesta sullo stesso giocatore
+            for i in range(4*self.__numPlayers):#look 4 moves ahead
                 count+= 1
                 turn= (turn+1)%self.__numPlayers
                 nextBoard= nextBoard.randomMove(turn) #random farm board to randomly evolve the game
-            whoEndedGame= turn%self.__numPlayers
+                if count>=80 or nextBoard is None:
+                    break
+            didWin= None
+            if count<80 and nextBoard is not None:
+                oldHeuristic= nextBoard.heuristic(turn)   
+                while True:
+                    for i in range(2*self.__numPlayers):#look 2 moves ahead
+                        count+= 1
+                        turn= (turn+1)%self.__numPlayers
+                        nextBoard= nextBoard.randomMove(turn) #random farm board to randomly evolve the game
+                        if count>=80 or nextBoard is None:
+                            break
+                    if count>=80 or nextBoard is None:
+                        break
+                    newHeuristic= nextBoard.heuristic(turn)
+                    if oldHeuristic==newHeuristic:
+                        break
+                    else:
+                        oldHeuristic= newHeuristic
+                didWin= oldHeuristic
+            whoEndedGame= turn%self.__numPlayers    
             if count==80:#Stalemate case
                 didWin= 0
-            elif nextBoard is None:#the turn player lost
+            elif nextBoard is None:#i'm in a loosing position or I lost (no more moves available)
                 didWin= -1
-            else:
-                raise Exception("unmanaged case in while cicle no-memory simulations")
+            elif didWin==None:
+                raise Exception("unmanaged case in while no-memory simulations cicle")
             self.__updateStatus(myTurn, whoEndedGame, didWin)
             return whoEndedGame, didWin
         else:

@@ -338,8 +338,8 @@ class Checkers(Game):
             return None
         else:
             return random.choice(moves)
-
-    def heuristic(self):
+    
+    def heuristic(self, turn: int) -> int:
         white_score = 0
         black_score = 0
         for row in range(self.rows):
@@ -349,4 +349,15 @@ class Checkers(Game):
                     white_score += 2.2 if is_king(piece) else 1
                 elif is_black(piece):
                     black_score += 2.2 if is_king(piece) else 1
-        return white_score - black_score
+        
+        if self.is_white_turn(turn):
+            delta= white_score - black_score
+        else:
+            delta= black_score - white_score
+        if delta>0:
+            rc= 1
+        elif delta==0:
+            rc= 0
+        else:
+            rc= -1
+        return rc
