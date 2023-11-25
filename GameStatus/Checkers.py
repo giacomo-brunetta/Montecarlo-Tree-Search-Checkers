@@ -313,13 +313,8 @@ class Checkers(Game):
                 if (isWhiteTurn and is_white(piece)) or (not isWhiteTurn and is_black(piece)):
                     # Move is a class that supports comparators so ==, >, max() are overloaded
                     jump_moves = self._jumps(row, col)  # eval jump moves.
-                    if len(jump_moves) == 1:
-                        curr_move = jump_moves[0]
-                        if curr_move > max_jump:
-                            max_jump = curr_move
-                            moves = [curr_move]
 
-                    elif len(jump_moves) > 1:
+                    if len(jump_moves) > 0:
                         # if new best is found clear list and update the best
                         temp_max = max(jump_moves)
                         if temp_max > max_jump:

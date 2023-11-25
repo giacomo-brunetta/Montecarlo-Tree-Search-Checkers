@@ -1,9 +1,12 @@
 import unittest
 from GameStatus.Checkers import Checkers as Checkers
-from GameStatus.Tile import Tile as Tile
 from GameStatus.Node import Node as Node
-from GameStatus.MontecarloTreeSearch import MontecarloTreeSearch as MontecarloTreeSearch
 
+EMPTY = 0
+BLACK_CHECKER = -1
+BLACK_KING = -2
+WHITE_CHECKER = 1
+WHITE_KING = 2
 
 class TestBoard(unittest.TestCase):
     def test_equal(self):
@@ -14,7 +17,7 @@ class TestBoard(unittest.TestCase):
         self.assertEqual(b, b1)  # equal to identical
         self.assertEqual(b1, b)
 
-        b1.set(0, 0, Tile(2))
+        b1.set(0, 0, 2)
 
         # different from different board
         self.assertNotEqual(b, b1)
@@ -33,12 +36,12 @@ class TestBoard(unittest.TestCase):
 
         self.assertEqual(b,b1)
 
-        b.set(0, 0, Tile.BLACK_KING)
+        b.set(0, 0, BLACK_KING)
         self.assertNotEqual(b, b1)
     
     def testCopy(self):
         b0 = Checkers()
-        b0.set(0, 0, Tile.WHITE_CHECKER)
+        b0.set(0, 0, WHITE_CHECKER)
         b1 = b0.copy()
         b2= b0.copy()
         self.assertTrue(b0 is not b1)
@@ -61,10 +64,10 @@ class TestBoard(unittest.TestCase):
         self.assertEqual(len(b.moves(0)), 7)
         self.assertEqual(len(b.moves(1)), 7)
 
-        b.set(3, 1, Tile.BLACK_CHECKER)
-        b.set(3, 3, Tile.BLACK_CHECKER)
-        b.set(5, 1, Tile.EMPTY)
-        b.set(5, 3, Tile.EMPTY)
+        b.set(3, 1, BLACK_CHECKER)
+        b.set(3, 3, BLACK_CHECKER)
+        b.set(5, 1, EMPTY)
+        b.set(5, 3, EMPTY)
 
         self.assertEqual(len(b.moves(0)), 4)
 
@@ -72,32 +75,47 @@ class TestBoard(unittest.TestCase):
         for row in range(6,b.rows):
             for col in range(b.cols):
                 if b.is_settable(row,col):
-                    b.set(row,col, Tile.EMPTY)
+                    b.set(row,col, EMPTY)
 
         self.assertEqual(len(b.moves(0)), 4)
 
         for row in range(b.rows):
             for col in range(b.cols):
                 if b.is_settable(row, col):
-                    b.set(row, col, Tile.EMPTY)
+                    b.set(row, col, EMPTY)
 
-        b.set(4, 4, Tile.WHITE_KING)
-        b.set(3, 3, Tile.BLACK_KING)
-        b.set(1, 1, Tile.BLACK_KING)
-        b.set(5, 5, Tile.BLACK_KING)
-
-        self.assertEqual(len(b.moves(0)), 1)
-
-        b.set(5, 3, Tile.BLACK_KING)
+        b.set(4, 4, WHITE_KING)
+        b.set(3, 3, BLACK_KING)
+        b.set(1, 1, BLACK_KING)
+        b.set(5, 5, BLACK_KING)
 
         self.assertEqual(len(b.moves(0)), 1)
 
-        b.set(5, 1, Tile.BLACK_KING)
+        b.set(5, 3, BLACK_KING)
+
+        self.assertEqual(len(b.moves(0)), 1)
+
+        b.set(5, 1, BLACK_KING)
 
         self.assertEqual(len(b.moves(0)), 2)
 
-        b.set(5, 1, Tile.BLACK_CHECKER)
+        b.set(5, 1, BLACK_CHECKER)
         self.assertEqual(len(b.moves(0)), 1)
+
+    def testMoves2(self):
+        b = Checkers()
+
+        for r in range(b.rows):
+            for c in range(b.cols):
+                b.set(r,c, EMPTY)
+
+        b.set(5,3,BLACK_CHECKER)
+        b.set(5,5,BLACK_CHECKER)
+        b.set(4,4,WHITE_CHECKER)
+        print(b)
+
+        for move in b.moves(1):
+            print(move)
 
     def testImSpeed(self):
         b = Checkers()
