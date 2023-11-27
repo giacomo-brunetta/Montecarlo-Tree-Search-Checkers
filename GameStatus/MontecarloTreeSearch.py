@@ -1,12 +1,11 @@
 from GameStatus.Node import Node as Node
 from GameStatus.Game import Game
-from GameStatus.Checkers import Checkers
 
 from typing import Type
 from random import random
 from math import sqrt, log
 from time import time
-
+from multiprocessing import Pool
 
 class MontecarloTreeSearch(Node):
     __maxSeconsPerMove= 3
@@ -73,6 +72,9 @@ class MontecarloTreeSearch(Node):
 
     def getProbability(self) -> float:
         return self.__probability
+
+    def getMinSimulations(self) -> int:
+        return 30*self.getValue().getBranchingFactor()**self.__n
     
     def setProbability(self, p: float):
         assert p>=0 and p<=1, "probability out of bound, cant have a negative or grater than one probability"
@@ -157,46 +159,55 @@ class MontecarloTreeSearch(Node):
         else:
             raise Exception(f"unmanaged case in winnings tree visit, heigth={self.__height}")
 
-    def findNextBestMove(self, turn: int) -> Type['Game']:
-        if len(self.getChildren())==1:
-            return self.getChildren()[0].getValue().copy()
-        elif len(self.getChildren())==0:
+    def chooseChild(self, children) -> Type["MontecarloTreeSearch"]:
+        worstChild = None
+        for child in children:
+            if worstChild is not None:
+                if child.getLosses() > worstChild.getLosses():
+                    worstChild = child
+                else:
+                    if child.getLosses() == worstChild.getLosses() and child.getStalemate() > worstChild.getStalemate():
+                        worstChild = child
+            else:
+                worstChild = child
+        return worstChild
+
+
+    def simulate(self, turn: int) -> Type['MontecarloTreeSearch']:
+        # run simulation until seconds per moves are expired
+        startTime= time()
+        for i in range(self.getMinSimulations()):
+            self.randomVisitAndSave(self.__n, turn%self.__numPlayers)
+        # con i tempi: te giochi e mi fai il numero minimo di mosse per essere accourato con quel
+        # numero n di livelli di memoria poi, controlli se hai passato il limite di tempo, se non lo hai
+        # passato, continua a simulare finché non passi il tempo
+        while(time()-startTime<self.__maxSeconsPerMove):
+            self.randomVisitAndSave(self.__n, turn%self.__numPlayers)
+        print(f"Time used: {time()-startTime}sec")
+
+        if self.__verbose==True:
+            print("mts-deb-simulation results:---------------------------------------")
+            print(f"mts-deb:  h={self.__height}  played={self.getNumSimulation()} W={self.getWons()} s={self.__stalemate} L={self.__losses} Prob={round(self.getProbability(),2)}")
+            for child in self.getChildren():
+                print(f" mts-deb:  h={child.__height} played={child.getNumSimulation()} W={child.getWons()} s={child.__stalemate} L={child.__losses} Prob={round(child.getProbability(),2)}"+(" <-- <-- chosen!" if child is worstChild else " "))
+                for child2 in child.getChildren():
+                    print(f"    mts-deb:  h={child2.__height} played={child2.getNumSimulation()} W={child2.getWons()} s={child2.__stalemate} L={child2.__losses} Prob={round(child2.getProbability(),2)}")
+                    #for child3 in child2.getChildren():
+                    #    print(f"    mts-deb:  h={child3.__height}  played={child3.getNumSimulation()} W={child3.getWons()} s={child3.__stalemate} L={child3.__losses} Prob={round(child3.getProbability(),2)}")
+            #print(f"mts-deb: chosen child: played={worstChild.getNumSimulation()} W={worstChild.getWons()} s={worstChild.__stalemate} L={worstChild.__losses} Prob={round(worstChild.getProbability(),2)}")
+        return self
+
+
+    def move(self, turn: int) -> Type['Game']:
+        children = self.getChildren()
+        if len(children)==1:
+            return children[0].getValue().copy()
+        elif len(children)==0:
             return None
         else:
-            # run simulation untill seconds per moves are expired
-            startTime= time()
-            for i in range(30*self.getValue().getBranchingFactor()**self.__n):
-                self.randomVisitAndSave(self.__n, turn%self.__numPlayers)
-            # con i tempi: te giochi e mi fai il numero minimo di mosse per essere accourato con quel 
-            # numero n di livelli di memoria poi, controlli se hai passato il limite di tempo, se non lo hai 
-            # passato, continua a simulare finché non passi il tempo   
-            while(time()-startTime<self.__maxSeconsPerMove):
-                self.randomVisitAndSave(self.__n, turn%self.__numPlayers)
-            #if self.__verbose==True:
-            print(f"Time used: {time()-startTime}sec")
-            #I choose the more winning move above all the childs
-            worstChild= None
-            for child in self.getChildren():
-                if worstChild is not None:
-                    if child.getLosses() > worstChild.getLosses():
-                        worstChild= child
-                    else:
-                        if child.getLosses() == worstChild.getLosses() and child.getStalemate()>worstChild.getStalemate():
-                           worstChild= child 
-                else:
-                    worstChild= child
-            if self.__verbose==True:
-                print("mts-deb-simulation results:---------------------------------------")
-                print(f"mts-deb:  h={self.__height}  played={self.getNumSimulation()} W={self.getWons()} s={self.__stalemate} L={self.__losses} Prob={round(self.getProbability(),2)}")
-                for child in self.getChildren():
-                    print(f" mts-deb:  h={child.__height} played={child.getNumSimulation()} W={child.getWons()} s={child.__stalemate} L={child.__losses} Prob={round(child.getProbability(),2)}"+(" <-- <-- chosen!" if child is worstChild else " "))
-                    for child2 in child.getChildren():
-                        print(f"    mts-deb:  h={child2.__height} played={child2.getNumSimulation()} W={child2.getWons()} s={child2.__stalemate} L={child2.__losses} Prob={round(child2.getProbability(),2)}")
-                        #for child3 in child2.getChildren():
-                        #    print(f"    mts-deb:  h={child3.__height}  played={child3.getNumSimulation()} W={child3.getWons()} s={child3.__stalemate} L={child3.__losses} Prob={round(child3.getProbability(),2)}")
-                #print(f"mts-deb: chosen child: played={worstChild.getNumSimulation()} W={worstChild.getWons()} s={worstChild.__stalemate} L={worstChild.__losses} Prob={round(worstChild.getProbability(),2)}")
-            return worstChild.getValue().copy()
-    
-    def move(self, turn: int) -> Type['Game']:
-        mov= self.findNextBestMove(turn)
-        return mov
+            with Pool(len(children)) as p:
+                level1 = p.starmap(simulate_wrapper, [(child, turn+1) for child in children])
+            return self.chooseChild(level1).getValue().copy()
+
+def simulate_wrapper(node, turn):
+    return node.simulate(turn)
