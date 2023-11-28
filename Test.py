@@ -71,8 +71,7 @@ class TestBoard(unittest.TestCase):
 
         self.assertEqual(len(b.moves(0)), 4)
 
-
-        for row in range(6,b.rows):
+        for row in range(5,b.rows):
             for col in range(b.cols):
                 if b.is_settable(row,col):
                     b.set(row,col, EMPTY)

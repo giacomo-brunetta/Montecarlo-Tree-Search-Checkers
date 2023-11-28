@@ -34,8 +34,8 @@ def main():
     verbose = False
     game = None
     players = []
-    levelsOfMemory = 4
-    secondsPerMove = 5
+    levelsOfMemory = 2
+    secondsPerMove = 3
 
     try:
         # Parsing argument
@@ -80,7 +80,7 @@ def main():
                     players.append(HumanPlayer(name))
 
                 elif c == "m":
-                    players.append(MontecarloMachinePlayer("Carlo", game.copy(), levelsOfMemory, secondsPerMove, True, verbose))
+                    players.append(MontecarloMachinePlayer("Carlo", levelsOfMemory, secondsPerMove, len(players_str), verbose))
 
                 elif c == "t":
                     players.append(TestPlayer())

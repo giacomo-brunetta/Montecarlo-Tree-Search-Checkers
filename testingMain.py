@@ -18,8 +18,8 @@ def main():
     gameTable= Checkers()
     machine=  MontecarloMachinePlayer("PrimoGiocatore1",smartness,0.2,2,True)#4 profondita (7 inizia a essere tantino), 30 sec per mossa
     nothuman= MontecarloMachinePlayer("SecondoGiocatore2",smartness,0.2,2,True)#HumanPlayer("Mario")
-    #nothuman= HumanPlayer("Alberto")
-    humVSmac= Match([machine,nothuman],gameTable)
+    human= HumanPlayer("Alberto")
+    humVSmac= Match([machine, human],gameTable)
     humVSmac.play() 
 
 if __name__ == "__main__":

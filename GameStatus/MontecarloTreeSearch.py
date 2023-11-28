@@ -183,9 +183,9 @@ class MontecarloTreeSearch(Node):
         # passato, continua a simulare finché non passi il tempo
         while(time()-startTime<self.__maxSeconsPerMove):
             self.randomVisitAndSave(self.__n, turn%self.__numPlayers)
-        print(f"Time used: {time()-startTime}sec")
 
         if self.__verbose==True:
+            print(f"Time used: {time() - startTime}sec")
             print("mts-deb-simulation results:---------------------------------------")
             print(f"mts-deb:  h={self.__height}  played={self.getNumSimulation()} W={self.getWons()} s={self.__stalemate} L={self.__losses} Prob={round(self.getProbability(),2)}")
             for child in self.getChildren():
