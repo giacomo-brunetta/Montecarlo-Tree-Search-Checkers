@@ -14,7 +14,7 @@ class MontecarloMachinePlayer(Player):
 
     def move(self, gameStatus: Type['Game'], turn: int) -> Type['Game']:
         print(f"Loading {self._name}'s {turn} turn move...   [wait at least {self.__sec}s]")
-        engine= MontecarloTreeSearch(None,gameStatus,self.__lvls,self.__numPlayers,0,turn,1)
-        engine.verbosity(self.__verbosity)
+        engine= MontecarloTreeSearch(gameStatus,self.__lvls,self.__numPlayers,0,turn,1)
+        engine.setVerbosity(self.__verbosity)
         engine.setSecPerMove(self.__sec)
         return engine.move(turn)
