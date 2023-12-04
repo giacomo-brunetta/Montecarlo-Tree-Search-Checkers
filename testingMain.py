@@ -5,6 +5,7 @@ from GameStatus.HumanPlayer import HumanPlayer
 from os import system
 
 def main():
+    """
     system('clear')
     while True:
         try:
@@ -13,7 +14,8 @@ def main():
                 break
         except:
             exit(-1)
-
+    """
+    smartness = 2
     gameTable= Checkers()
     machine=  MontecarloMachinePlayer("FirstPlayer", smartness,1,2,False)
     nothuman= MontecarloMachinePlayer("SecondPlayer",smartness,1,2,False)

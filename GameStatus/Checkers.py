@@ -124,16 +124,12 @@ class Checkers(Game):
     # CLASS BUILDERS
     def __init__(self, board=None):
         if board is None:
-            self.__board = [[WHITE_CHECKER] * 4,
-                            [WHITE_CHECKER] * 4,
-                            [WHITE_CHECKER] * 4,
-                            [EMPTY] * 4,
-                            [EMPTY] * 4,
-                            [BLACK_CHECKER] * 4,
-                            [BLACK_CHECKER] * 4,
-                            [BLACK_CHECKER] * 4]
+            self.__board = {}
+            for i in range(12):
+                self.__board[i] = WHITE_CHECKER
+                self.__board[i+20] = BLACK_CHECKER
         else:
-            self.__board = [row.copy() for row in board]
+            self.__board = board.copy()
         self.rows = 8
         self.cols = 8
 
@@ -157,12 +153,19 @@ class Checkers(Game):
             return EMPTY
 
         col_mapped = int((col - (row % 2)) / 2)
-        return self.__board[row][col_mapped]
+        pos = row * 4 + col_mapped
+
+        return self.__board[pos] if pos in self.__board else EMPTY
 
     def set(self, row: int, col: int, piece: int):
         # assert self.is_settable(row, col), "Cannot set this cell"
         col_mapped = int((col - (row % 2)) / 2)
-        self.__board[row][col_mapped] = piece
+        pos = row * 4 + col_mapped
+
+        if piece == EMPTY and pos in self.__board:
+            self.__board.pop(pos)
+        else:
+            self.__board[pos] = piece
 
     # VIEW
     def __repr__(self) -> str:
