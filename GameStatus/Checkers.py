@@ -151,7 +151,6 @@ class Checkers(Game):
         # assert self.in_bounds(row, col), "Index of bounds for board"
         if (row + col) % 2 == 1:
             return EMPTY
-
         col_mapped = int((col - (row % 2)) / 2)
         pos = row * 4 + col_mapped
 
@@ -308,30 +307,29 @@ class Checkers(Game):
         moves = []
         max_jump = None
 
-        for row in range(self.rows):
-            for col in range(row % 2, self.cols, 2):  # only valid tiles
-                piece = self.get(row, col)
+        for pos, piece in self.__board.items():
+            # the piece belong to the player that moves this turn
+            if (isWhiteTurn and is_white(piece)) or (not isWhiteTurn and is_black(piece)):
+                # Move is a class that supports comparators so ==, >, max() are overloaded
+                row = pos // 4
+                col = (pos % 4) * 2 + (row % 2)
+                jump_moves = self._jumps(row, col)  # eval jump moves.
 
-                # the piece belong to the player that moves this turn
-                if (isWhiteTurn and is_white(piece)) or (not isWhiteTurn and is_black(piece)):
-                    # Move is a class that supports comparators so ==, >, max() are overloaded
-                    jump_moves = self._jumps(row, col)  # eval jump moves.
+                if len(jump_moves) > 0:
+                    # if new best is found clear list and update the best
+                    temp_max = max(jump_moves)
+                    if temp_max > max_jump:
+                        max_jump = temp_max
+                        moves.clear()
 
-                    if len(jump_moves) > 0:
-                        # if new best is found clear list and update the best
-                        temp_max = max(jump_moves)
-                        if temp_max > max_jump:
-                            max_jump = temp_max
-                            moves.clear()
+                    # append only the best moves
+                    for move in jump_moves:
+                        if move == max_jump:
+                            moves.append(move)
 
-                        # append only the best moves
-                        for move in jump_moves:
-                            if move == max_jump:
-                                moves.append(move)
-
-                    # if no jumps are available, eval simple moves
-                    elif max_jump is None:
-                        moves += self.__move_piece(row, col)
+                # if no jumps are available, eval simple moves
+                elif max_jump is None:
+                    moves += self.__move_piece(row, col)
 
         return [move.status for move in moves]
 
