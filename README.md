@@ -29,7 +29,9 @@ To date, we only support [Italian Draughts](https://en.wikipedia.org/wiki/Italia
 We chose it because it is not trivial like Tick Tac Toe or Connect 4, but it has a reasonable branching factor compared to Chess or GO.
 
 ## The architecture
-![Class diagram](https://github.com/giacomo-brunetta/Montecarlo-Tree-Search-Checkers/assets/102242995/e9b24470-883b-4e90-ae5a-2d2c7086a23d)
+![Class Diagram](https://github.com/giacomo-brunetta/Montecarlo-Tree-Search-Checkers/assets/102242995/37302bca-89d2-44c7-976c-fba34e000145)
+
+
 
 ## Contributors
 - __Brunetta Giacomo__ Github: _@giacomo-brunetta_ e-mail: giacomo.brunetta@mail.polimi.it
