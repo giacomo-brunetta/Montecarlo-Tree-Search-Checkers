@@ -5,7 +5,7 @@
 The goal of the project is to have a game engine that supports potentially any game with 1 to N players.
 The players can be:
 - Human players: provided with a CLI interface that allows them to play
-- BOTs: that play autonomously
+- BOTs: autonomous entities that can compete against humans or other bots
 
 ## The algorithm
 
@@ -35,7 +35,7 @@ We chose it because it is not trivial like Tick Tac Toe or Connect 4, but it has
 
 ## Contributors
 - __Brunetta Giacomo__ Github: _@giacomo-brunetta_ e-mail: giacomo.brunetta@mail.polimi.it
-- GitHub: _@g7240_
+- __Bellini Gabriele__ GitHub: [_@g7240_](https://github.com/g7240)
 
 
 
